@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,6 +30,24 @@
             padding: 10px;
             border: 1px solid #00796b;
         }
+        /* New Shop Styles */
+        #shop-menu {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border: 2px solid #018c7c;
+            background: #e0f7fa;
+        }
+        #code-input {
+            padding: 8px;
+            font-family: monospace;
+            width: 200px;
+        }
+        #code-hint {
+            font-size: 0.8em;
+            color: #555;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -51,10 +68,18 @@
         <button id="inventory-btn">Inventory</button>
         <button id="reset-btn">Reset Game</button>
         <button id="sell-btn">Sell Inventory</button>
+        
+        <!-- New Shop Menu -->
+        <div id="shop-menu">
+            <h3>Secret Code Redemption</h3>
+            <input type="text" id="code-input" placeholder="Enter code...">
+            <button id="redeem-btn">Redeem</button>
+            <button id="close-shop">Close</button>
+            <div id="code-hint">Try: KOOLKATS, LEGENDARY, RICH, EXOTIC</div>
+        </div>
     </div>
 
     <script>
-
         // Game Data
         const fishData = {
             "Pufferfish": "rare",
@@ -172,10 +197,6 @@
             "will's fish": "exotic",
             "joaquin's fish": "exotic",
             "TeN pAcKeT's Of HuBbu BaBbAa": "rare",
-            
-
-
-
         };
 
         const rarityWeights = {
@@ -188,6 +209,24 @@
             "no": 0.00001,
         };
 
+        // Secret Codes
+        const secretCodes = {
+            "KOOLKATS": { money: 500, message: "🐱 Meow! Kool Kats bonus!" },
+            "LEGENDARY": { fish: "Whale Shark", message: "🐋 Legendary fish unlocked!" },
+            "RICH": { money: 1000, message: "💰 You're rich now!" },
+            "EXOTIC": { fish: "Bass's Controller", message: "🎮 Rare exotic item added!" }
+            "JOAQUIN": { fish: "joaquin's fish", money: 100, message: "FREE JOAQUIN FISH" }
+            "GOLDMINE": { fish: "Goldfish", quantity: 10, message: "🏆 Gold rush!" },
+            "MYSTERY": { 
+                effect: () => {
+                    const randomExotic = Object.keys(fishData).filter(f => fishData[f] === "exotic");
+                    const reward = randomExotic[Math.floor(Math.random() * randomExotic.length)];
+                    inventory.push(reward);
+                    return `🎁 You got ${reward}!`;
+                }
+            }
+        };
+
         // Game State
         let inventory = [];
         let money = 100;
@@ -196,6 +235,8 @@
         const outputEl = document.getElementById("output");
         const moneyEl = document.getElementById("money-display");
         const inventoryCountEl = document.getElementById("inventory-count");
+        const shopMenuEl = document.getElementById("shop-menu");
+        const codeInputEl = document.getElementById("code-input");
 
         // Initialize Game
         document.addEventListener("DOMContentLoaded", () => {
@@ -204,19 +245,25 @@
 
             // Button Event Listeners
             document.getElementById("fish-btn").addEventListener("click", fish);
-            document.getElementById("shop-btn").addEventListener("click", shop);
+            document.getElementById("shop-btn").addEventListener("click", toggleShop);
             document.getElementById("inventory-btn").addEventListener("click", showInventory);
             document.getElementById("reset-btn").addEventListener("click", resetGame);
             document.getElementById("sell-btn").addEventListener("click", sellInventory);
+            document.getElementById("redeem-btn").addEventListener("click", redeemCode);
+            document.getElementById("close-shop").addEventListener("click", toggleShop);
         });
 
         // Core Game Functions
         function fish() {
-
             const rarity = weightedRandom(rarityWeights);
             const eligibleFish = Object.keys(fishData).filter(fish => fishData[fish] === rarity);
-            const caughtFish = eligibleFish[Math.floor(Math.random() * eligibleFish.length)];
+            
+            if (eligibleFish.length === 0) {
+                outputEl.innerHTML = `⚡ Glitch! No ${rarity} fish found.`;
+                return;
+            }
 
+            const caughtFish = eligibleFish[Math.floor(Math.random() * eligibleFish.length)];
             inventory.push(caughtFish);
             outputEl.innerHTML = `🎣 You caught a <strong>${caughtFish}</strong> (${rarity})!`;
             saveGame();
@@ -230,13 +277,46 @@
                 sum += weight;
                 if (rand <= sum) return rarity;
             }
-            return "Common"; // fallback
+            return "common"; // fallback
         }
 
-        function shop() {
-            outputEl.innerHTML = "Full shop coming soon!";
+        // Shop Functions
+        function toggleShop() {
+            shopMenuEl.style.display = shopMenuEl.style.display === "block" ? "none" : "block";
+            outputEl.innerHTML = shopMenuEl.style.display === "block" ? "Enter a secret code!" : "";
+            codeInputEl.focus();
+        }
 
+        function redeemCode() {
+            const code = codeInputEl.value.trim().toUpperCase();
+            if (!code) return;
 
+            if (secretCodes[code]) {
+                const reward = secretCodes[code];
+                
+                if (reward.money) {
+                    money += reward.money;
+                    outputEl.innerHTML = reward.message + ` +$${reward.money}`;
+                }
+                
+                if (reward.fish) {
+                    const quantity = reward.quantity || 1;
+                    for (let i = 0; i < quantity; i++) {
+                        inventory.push(reward.fish);
+                    }
+                    outputEl.innerHTML = reward.message + ` (${quantity}x ${reward.fish})`;
+                }
+                
+                if (reward.effect) {
+                    outputEl.innerHTML = reward.effect();
+                }
+                
+                codeInputEl.value = "";
+                saveGame();
+                updateUI();
+            } else {
+                outputEl.innerHTML = "❌ Invalid code! Try another.";
+            }
         }
 
         function showInventory() {
@@ -298,7 +378,7 @@
             let totalValue = 0;
             inventory.forEach(item => {
                 const rarity = fishData[item];
-                totalValue += rarityValues[rarity] || 0; // Default to 0 if rarity is undefined
+                totalValue += rarityValues[rarity] || 0;
             });
 
             // Add money and clear inventory
