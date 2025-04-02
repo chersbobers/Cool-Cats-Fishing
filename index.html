@@ -7,10 +7,8 @@
         body {
             font-family: monospace;
             text-align: center;
-            <!-- background: #adebe1; -->
+            background: #adebe1;
             padding: 20px;
-            img.repeat{ float:left; }
-            #wrapper{ width: 800px; height: 400px; }
         }
         #game {
             margin: 0 auto;
@@ -36,9 +34,6 @@
     </style>
 </head>
 <body>
-    <div id="wrapper">
-    <img class="repeat" src="1.png" />
-</div>
     <div id="game">
         <pre>
      /\_/\          ><((((º>
@@ -59,9 +54,6 @@
     </div>
 
     <script>
-        $(document).ready(function(){
-    $('img.repeat').clone().appendTo('#wrapper');// repeat as many times as neccesary
-});
 
         // Game Data
         const fishData = {
