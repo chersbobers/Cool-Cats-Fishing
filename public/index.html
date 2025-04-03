@@ -47,6 +47,8 @@
             color: #555;
             margin-top: 10px;
         }
+        
+        /* CHAT STYLES */
         #chat-container {
             position: fixed;
             bottom: 10px;
@@ -56,63 +58,41 @@
             border: 2px solid #018c7c;
             z-index: 1000;
             border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         #chat-header {
             background: #4fc3f7;
-            padding: 8px 12px;
+            padding: 8px;
             cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 3px 3px 0 0;
+            border-radius: 5px 5px 0 0;
         }
         #chat-content {
             display: none;
             padding: 10px;
         }
         #chat-messages {
-            height: 200px;
+            height: 150px;
             overflow-y: auto;
             margin-bottom: 10px;
             border: 1px solid #00796b;
-            padding: 8px;
-            background: white;
-            font-size: 0.9em;
-            border-radius: 3px;
-        }
-        .message {
-            margin-bottom: 8px;
             padding: 5px;
-            background: #f5f5f5;
-            border-radius: 3px;
-        }
-        #chat-input-container {
-            display: flex;
-            gap: 5px;
+            background: white;
         }
         #chat-input {
-            flex-grow: 1;
-            padding: 8px;
+            width: calc(100% - 60px);
+            padding: 5px;
             font-family: monospace;
             border: 1px solid #018c7c;
-            border-radius: 3px;
         }
         #chat-send {
-            padding: 8px 12px;
+            width: 55px;
+            padding: 5px;
             background: #4fc3f7;
             border: none;
             cursor: pointer;
             font-family: monospace;
-            border-radius: 3px;
-        }
-        #chat-send:hover {
-            background: #3da8d8;
         }
         #user-count {
             font-size: 0.8em;
-            color: #555;
-            margin-top: 5px;
         }
     </style>
 </head>
@@ -144,55 +124,57 @@
         </div>
     </div>
 
+    <!-- CHAT CONTAINER -->
     <div id="chat-container">
         <div id="chat-header" onclick="toggleChat()">
-            <span>Kool Kat Chat (<span id="user-count">1</span>)</span>
+            <span>Kool Kat Chat (<span id="user-count">0</span>)</span>
             <span id="chat-toggle">▼</span>
         </div>
         <div id="chat-content">
             <div id="chat-messages"></div>
-            <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Type message..." autocomplete="off">
-                <button id="chat-send" onclick="sendMessage()">Send</button>
-            </div>
-            <div id="user-count-display"></div>
+            <input type="text" id="chat-input" placeholder="Type message...">
+            <button id="chat-send" onclick="sendMessage()">Send</button>
         </div>
     </div>
 
+    <!-- Socket.io Client -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    
     <script>
-        const socket = io({
-            path: '/socket.io',
-            transports: ['websocket']
-        });
+        // Initialize Socket.io connection - CHANGE THIS TO YOUR SERVER URL
+        const socket = io('http://localhost:3000');
         
         let username = `Fisher${Math.floor(Math.random() * 1000)}`;
 
+        // Connection handlers
+        socket.on('connect', () => {
+            console.log('Connected to chat server');
+        });
+
+        socket.on('connect_error', (err) => {
+            console.log('Connection error:', err);
+            document.getElementById('user-count').textContent = "0 (Offline)";
+        });
+
+        // Update user count
         socket.on('userCount', (count) => {
             document.getElementById('user-count').textContent = count;
         });
 
+        // Receive messages
         socket.on('message', (msg) => {
             const messagesDiv = document.getElementById('chat-messages');
             const messageElement = document.createElement('div');
-            messageElement.className = 'message';
             messageElement.innerHTML = `<strong>${msg.username}:</strong> ${msg.text}`;
             messagesDiv.appendChild(messageElement);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
 
+        // Chat functions
         function toggleChat() {
             const chatContent = document.getElementById('chat-content');
-            const chatToggle = document.getElementById('chat-toggle');
-            if (chatContent.style.display === 'block') {
-                chatContent.style.display = 'none';
-                chatToggle.textContent = '▼';
-            } else {
-                chatContent.style.display = 'block';
-                chatToggle.textContent = '▲';
-                document.getElementById('chat-input').focus();
-            }
+            chatContent.style.display = chatContent.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('chat-toggle').textContent = 
+                chatContent.style.display === 'block' ? '▲' : '▼';
         }
 
         function sendMessage() {
@@ -201,22 +183,18 @@
             if (message) {
                 socket.emit('newMessage', {
                     username: username,
-                    text: sanitizeHTML(message)
+                    text: message
                 });
                 input.value = '';
             }
         }
 
+        // Send message on Enter key
         document.getElementById('chat-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') sendMessage();
         });
 
-        function sanitizeHTML(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
+        // YOUR ORIGINAL GAME CODE STARTS HERE
         const fishData = {
             "Pufferfish": "rare",
             "Mermaid's Hair": "legendary",
@@ -547,4 +525,3 @@
     </script>
 </body>
 </html>
-                
