@@ -7,7 +7,6 @@
     <style>
         body {
             font-family: monospace;
-            text-align: center;
             background: #adebe1;
             padding: 10px;
         }
@@ -150,7 +149,7 @@
     <!-- Chat Container -->
     <div id="chat-container">
         <div id="chat-header" onclick="toggleChat()">
-            <span>Kool Kat Chat (<span id="user-count">0</span>)</span>
+            <span>Kool Kat Chat (<span id="user-count">1</span>)</span>
             <span id="chat-toggle">▼</span>
         </div>
         <div id="chat-content">
@@ -172,7 +171,7 @@
         
         // ================= CHAT FUNCTIONS =================
         let username = `Fisher${Math.floor(Math.random() * 1000)}`;
-        let onlineUsers = 1;
+        let userCount = 1;
 
         // Initialize chat
         async function initChat() {
@@ -183,7 +182,7 @@
                 .order('created_at', { ascending: false })
                 .limit(20);
             
-            if (messages) {
+            if (messages && messages.length > 0) {
                 messages.reverse().forEach(displayMessage);
             }
 
@@ -195,15 +194,14 @@
                     {
                         event: 'INSERT',
                         schema: 'public',
-                        table: 'messages'
+                        table: 'messages',
+                        filter: 'message=eq.*'
                     },
                     (payload) => {
                         displayMessage(payload.new);
                     }
                 )
                 .subscribe();
-
-            updateOnlineCount();
         }
 
         function displayMessage(message) {
@@ -249,11 +247,7 @@
             }
         }
 
-        function updateOnlineCount() {
-            document.getElementById('user-count').textContent = onlineUsers;
-        }
-
-        // ================= GAME FUNCTIONS =================
+        // ================= GAME CODE =================
         const fishData = {
             "Pufferfish": "rare",
             "Mermaid's Hair": "legendary",
