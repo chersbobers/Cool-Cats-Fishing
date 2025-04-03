@@ -7,6 +7,7 @@
     <style>
         body {
             font-family: monospace;
+            text-align: center;
             background: #adebe1;
             padding: 10px;
         }
@@ -48,6 +49,8 @@
             color: #555;
             margin-top: 10px;
         }
+        
+        /* Chat Styles */
         #chat-container {
             position: fixed;
             bottom: 10px;
@@ -135,7 +138,7 @@
         <button id="inventory-btn">Inventory</button>
         <button id="reset-btn">Reset Game</button>
         <button id="sell-btn">Sell Inventory</button>
-
+        
         <div id="shop-menu">
             <h3>Secret Code Redemption</h3>
             <input type="text" id="code-input" placeholder="Enter code...">
@@ -145,6 +148,7 @@
         </div>
     </div>
 
+    <!-- Chat Container -->
     <div id="chat-container">
         <div id="chat-header" onclick="toggleChat()">
             <span>Kool Kat Chat (<span id="user-count">1</span>)</span>
@@ -154,22 +158,20 @@
             <div id="chat-messages"></div>
             <div id="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Type message..." autocomplete="off">
-                <button id="chat-send" onclick="sendMessage()">Send</button>
+                <button id="chat-send">Send</button>
             </div>
             <div id="user-count-display"></div>
         </div>
     </div>
 
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
     <script>
         // ================= SUPABASE SETUP =================
         // Replace these with your actual Supabase credentials
-        const SUPABASE_URL = 'https://kuayqobvbmvmxyjhffcb.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1YXlxb2J2Ym12bXh5amhmZmNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MDAwMDgsImV4cCI6MjA1OTI3NjAwOH0.JCiCK4eK0o3EeodD-ux5ewBPWiLU1koBqUxgqb0pTXY';
-
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_KEY = 'your-anon-key';
+        
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+        
         // ================= CHAT FUNCTIONS =================
         let username = `Fisher${Math.floor(Math.random() * 1000)}`;
         let userCount = 1;
@@ -182,7 +184,7 @@
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(20);
-
+            
             if (messages) {
                 messages.reverse().forEach(displayMessage);
             }
@@ -220,12 +222,12 @@
                 const { error } = await supabase
                     .from('messages')
                     .insert([
-                        {
+                        { 
                             username: username,
-                            message: message
+                            message: message 
                         }
                     ]);
-
+                
                 if (!error) {
                     input.value = '';
                 }
@@ -245,16 +247,7 @@
             }
         }
 
-        document.getElementById('chat-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        // Initialize chat when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            initChat();
-        });
-
-        // ================= YOUR ORIGINAL GAME CODE =================
+        // ================= GAME FUNCTIONS =================
         const fishData = {
             "Pufferfish": "rare",
             "Mermaid's Hair": "legendary",
@@ -390,7 +383,7 @@
             "EXOTIC": { fish: "Bass's Controller", message: "🎮 Rare exotic item added!" },
             "JOAQUIN": { fish: "joaquin's fish", money: 100, message: "FREE JOAQUIN FISH" },
             "GOLDMINE": { fish: "Goldfish", quantity: 10, message: "🏆 Gold rush!" },
-            "MYSTERY": {
+            "MYSTERY": { 
                 effect: () => {
                     const randomExotic = Object.keys(fishData).filter(f => fishData[f] === "exotic");
                     const reward = randomExotic[Math.floor(Math.random() * randomExotic.length)];
@@ -409,23 +402,10 @@
         const shopMenuEl = document.getElementById("shop-menu");
         const codeInputEl = document.getElementById("code-input");
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadGame();
-            updateUI();
-
-            document.getElementById("fish-btn").addEventListener("click", fish);
-            document.getElementById("shop-btn").addEventListener("click", toggleShop);
-            document.getElementById("inventory-btn").addEventListener("click", showInventory);
-            document.getElementById("reset-btn").addEventListener("click", resetGame);
-            document.getElementById("sell-btn").addEventListener("click", sellInventory);
-            document.getElementById("redeem-btn").addEventListener("click", redeemCode);
-            document.getElementById("close-shop").addEventListener("click", toggleShop);
-        });
-
         function fish() {
             const rarity = weightedRandom(rarityWeights);
             const eligibleFish = Object.keys(fishData).filter(fish => fishData[fish] === rarity);
-
+            
             if (eligibleFish.length === 0) {
                 outputEl.innerHTML = `⚡ Glitch! No ${rarity} fish found.`;
                 return;
@@ -460,12 +440,12 @@
 
             if (secretCodes[code]) {
                 const reward = secretCodes[code];
-
+                
                 if (reward.money) {
                     money += reward.money;
                     outputEl.innerHTML = reward.message + ` +$${reward.money}`;
                 }
-
+                
                 if (reward.fish) {
                     const quantity = reward.quantity || 1;
                     for (let i = 0; i < quantity; i++) {
@@ -473,11 +453,11 @@
                     }
                     outputEl.innerHTML = reward.message + ` (${quantity}x ${reward.fish})`;
                 }
-
+                
                 if (reward.effect) {
                     outputEl.innerHTML = reward.effect();
                 }
-
+                
                 codeInputEl.value = "";
                 saveGame();
                 updateUI();
@@ -582,7 +562,28 @@
             moneyEl.textContent = money;
             inventoryCountEl.textContent = inventory.length;
         }
+
+        // Initialize everything when page loads
+        document.addEventListener("DOMContentLoaded", () => {
+            loadGame();
+            updateUI();
+            initChat();
+
+            // Game button event listeners
+            document.getElementById("fish-btn").addEventListener("click", fish);
+            document.getElementById("shop-btn").addEventListener("click", toggleShop);
+            document.getElementById("inventory-btn").addEventListener("click", showInventory);
+            document.getElementById("reset-btn").addEventListener("click", resetGame);
+            document.getElementById("sell-btn").addEventListener("click", sellInventory);
+            document.getElementById("redeem-btn").addEventListener("click", redeemCode);
+            document.getElementById("close-shop").addEventListener("click", toggleShop);
+            
+            // Chat button event listeners
+            document.getElementById("chat-send").addEventListener("click", sendMessage);
+            document.getElementById("chat-input").addEventListener("keypress", function(e) {
+                if (e.key === "Enter") sendMessage();
+            });
+        });
     </script>
 </body>
 </html>
-
