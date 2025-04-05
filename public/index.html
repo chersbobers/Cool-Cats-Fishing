@@ -8,7 +8,10 @@
         body {
             font-family: monospace;
             padding: 10px;
-            background: cyan;
+            background-image: url('1.png'); /* Ensure the path is correct */
+            background-size: 200px 200px; /* Set each tile to 200px by 200px */
+            background-repeat: repeat; /* Repeat the image to create a tiled effect */
+        }
         #game {
             margin: 0 auto;
             padding: 20px;
@@ -119,10 +122,10 @@
 <body>
     <div id="game">
         <pre>
-                               /\_/\          ><((((º>
-                              ( o.o )   FISHING FOR COOL CATS
-                               (   )    <º))))><
-                                " "
+     /\_/\          ><((((º>
+    ( o.o )   FISH FOR KOOL KATS
+     ( > )    <º))))><
+      " "
         </pre>
         <div>
             <p>Fish Bones: $<span id="money-display">100</span></p>
@@ -401,6 +404,8 @@
 
         let inventory = [];
         let money = 100;
+        let currentFish = null; // Store the fish caught
+        let miniGameTimeout = null; // Store the timeout for the mini-game
 
         const outputEl = document.getElementById("output");
         const moneyEl = document.getElementById("money-display");
@@ -430,9 +435,61 @@
                 return;
             }
 
-            const caughtFish = eligibleFish[Math.floor(Math.random() * eligibleFish.length)];
-            inventory.push(caughtFish);
-            outputEl.innerHTML = `🎣 You caught a <strong>${caughtFish}</strong> (${rarity})!`;
+            currentFish = eligibleFish[Math.floor(Math.random() * eligibleFish.length)];
+            outputEl.innerHTML = `🎣 You hooked a <strong>${currentFish}</strong> (${rarity})! Type the code to catch it!`;
+
+            startMiniGame();
+        }
+
+        function startMiniGame() {
+            const randomCode = generateRandomCode(5); // Generate a 5-letter random code
+            const miniGameEl = document.createElement('div');
+            miniGameEl.id = 'mini-game';
+            miniGameEl.innerHTML = `
+                <p>Type this code within 5 seconds: <strong>${randomCode}</strong></p>
+                <input type="text" id="mini-game-input" placeholder="Type code here..." />
+                <button id="submit-mini-game">Submit</button>
+            `;
+            outputEl.appendChild(miniGameEl);
+
+            const inputEl = document.getElementById('mini-game-input');
+            const submitBtn = document.getElementById('submit-mini-game');
+
+            inputEl.focus();
+
+            // Handle submission
+            submitBtn.addEventListener('click', () => {
+                checkMiniGameResult(inputEl.value, randomCode);
+            });
+
+            // Set a 5-second timer
+            miniGameTimeout = setTimeout(() => {
+                checkMiniGameResult(null, randomCode); // Timeout means failure
+            }, 5000);
+        }
+
+        function generateRandomCode(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        function checkMiniGameResult(userInput, correctCode) {
+            clearTimeout(miniGameTimeout); // Clear the timeout
+            const miniGameEl = document.getElementById('mini-game');
+            if (miniGameEl) miniGameEl.remove(); // Remove the mini-game UI
+
+            if (userInput && userInput.toUpperCase() === correctCode) {
+                inventory.push(currentFish);
+                outputEl.innerHTML = `🎉 You caught the <strong>${currentFish}</strong>!`;
+            } else {
+                outputEl.innerHTML = `❌ You failed to catch the <strong>${currentFish}</strong>.`;
+            }
+
+            currentFish = null; // Reset the current fish
             saveGame();
             updateUI();
         }
