@@ -8,9 +8,7 @@
         body {
             font-family: monospace;
             padding: 10px;
-            background-image: url('1.png'); /* Ensure the path is correct */
-            background-size: 200px 200px; /* Set each tile to 200px by 200px */
-            background-repeat: repeat; /* Repeat the image to create a tiled effect */
+            background: #3ef0c0e3;
         }
         #game {
             margin: 0 auto;
@@ -417,8 +415,16 @@
             loadGame();
             updateUI();
 
-            document.getElementById("fish-btn").addEventListener("click", fish);
-            document.getElementById("shop-btn").addEventListener("click", toggleShop);
+            document.getElementById("fish-btn").addEventListener("click", () => {
+                console.log("Cast Line button clicked!");
+                fish();
+            });
+
+            document.getElementById("shop-btn").addEventListener("click", () => {
+                console.log("Shop button clicked!");
+                toggleShop();
+            });
+
             document.getElementById("inventory-btn").addEventListener("click", showInventory);
             document.getElementById("reset-btn").addEventListener("click", resetGame);
             document.getElementById("sell-btn").addEventListener("click", sellInventory);
@@ -427,6 +433,7 @@
         });
 
         function fish() {
+            console.log("Fishing logic here...");
             const rarity = weightedRandom(rarityWeights);
             const eligibleFish = Object.keys(fishData).filter(fish => fishData[fish] === rarity);
 
@@ -439,6 +446,13 @@
             outputEl.innerHTML = `🎣 You hooked a <strong>${currentFish}</strong> (${rarity})! Type the code to catch it!`;
 
             startMiniGame();
+        }
+
+        function toggleShop() {
+            console.log("Shop logic here...");
+            shopMenuEl.style.display = shopMenuEl.style.display === "block" ? "none" : "block";
+            outputEl.innerHTML = shopMenuEl.style.display === "block" ? "Enter a secret code!" : "";
+            codeInputEl.focus();
         }
 
         function startMiniGame() {
@@ -502,12 +516,6 @@
                 if (rand <= sum) return rarity;
             }
             return "common";
-        }
-
-        function toggleShop() {
-            shopMenuEl.style.display = shopMenuEl.style.display === "block" ? "none" : "block";
-            outputEl.innerHTML = shopMenuEl.style.display === "block" ? "Enter a secret code!" : "";
-            codeInputEl.focus();
         }
 
         function redeemCode() {
