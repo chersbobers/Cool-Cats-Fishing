@@ -6,7 +6,7 @@
         body {
             font-family: monospace;
             padding: 10px;
-            background: green;
+            background: cyan;
         }
         #game {
             margin: 0 auto;
@@ -59,7 +59,7 @@
             height: 5px;
             background: #018c7c;
             width: 100%;
-            transition: width 1000ms linear; /* change ms to time using L = s x 1000 */
+            transition: width 1000ms linear;
         }
         .key-to-press {
             font-size: 24px;
@@ -122,8 +122,8 @@
         let currentFish = null;
         let miniGameActive = false;
         let miniGameTimeout;
-        const miniGameDuration = 1000; // time L=1000 ls = 1 seccond if l10000 than s=10 secconds
-        const miniGameKeys = ['A', 'S', 'D', 'F', 'J', 'K', 'L']; // Keys for the mini-game
+        const miniGameDuration = 1000;
+        const miniGameKeys = ['A', 'S', 'D', 'F', 'J', 'K', 'L'];
 
         // ================= DOM ELEMENTS =================
         const outputEl = document.getElementById("output");
@@ -134,7 +134,7 @@
 
         // ================= GAME FUNCTIONS =================
         function fish() {
-            if (miniGameActive) return; // Prevent fishing during mini-game
+            if (miniGameActive) return;
             
             const fishTypes = Object.keys(fishData);
             const rarityRoll = Math.random();
@@ -162,7 +162,6 @@
             miniGameActive = true;
             const targetKey = miniGameKeys[Math.floor(Math.random() * miniGameKeys.length)];
             
-            // Display the key to press
             const miniGameDisplay = document.createElement('div');
             miniGameDisplay.id = 'mini-game-display';
             miniGameDisplay.innerHTML = `
@@ -172,26 +171,25 @@
             `;
             outputEl.appendChild(miniGameDisplay);
             
-            // Animate the timer bar
             setTimeout(() => {
                 document.getElementById('mini-game-timer').style.width = '0%';
             }, 50);
             
-            // Set up keyboard listener
             function handleKeyPress(e) {
-                if (e.key.toUpperCase() === targetKey) {
+                const pressedKey = e.key.toUpperCase();
+                if (pressedKey === targetKey) {
                     miniGameSuccess();
+                } else if (miniGameKeys.includes(pressedKey)) {
+                    miniGameFail();
                 }
             }
             
             document.addEventListener('keydown', handleKeyPress);
             
-            // Set timeout for failure
             miniGameTimeout = setTimeout(() => {
                 miniGameFail();
             }, miniGameDuration);
             
-            // Store the handler so we can remove it later
             miniGameTimeout.handler = handleKeyPress;
         }
 
@@ -223,6 +221,7 @@
             miniGameActive = false;
         }
 
+        // [Rest of your existing functions remain exactly the same...]
         function toggleShop() {
             shopMenuEl.style.display = shopMenuEl.style.display === "block" ? "none" : "block";
             outputEl.innerHTML = shopMenuEl.style.display === "block" ? "Enter a secret code!" : "";
@@ -328,7 +327,6 @@
 
         // ================= INITIALIZE GAME =================
         document.addEventListener("DOMContentLoaded", () => {
-            // Set up event listeners
             document.getElementById("fish-btn").addEventListener("click", fish);
             document.getElementById("shop-btn").addEventListener("click", toggleShop);
             document.getElementById("inventory-btn").addEventListener("click", showInventory);
@@ -337,11 +335,9 @@
             document.getElementById("redeem-btn").addEventListener("click", redeemCode);
             document.getElementById("close-shop").addEventListener("click", toggleShop);
             
-            // Load saved game
             loadGame();
             updateUI();
             
-            // Welcome message
             outputEl.innerHTML = "Welcome to Fishing for Kool Kats! Click 'Cast Line!' to start fishing!";
         });
     </script>
