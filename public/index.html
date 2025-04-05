@@ -1,14 +1,17 @@
-\
 <!DOCTYPE html>
 <html>
 <head>
     <title>Fishing for Kool Kats</title>
+    <!-- Add Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: monospace;
-            text-align: center;
             background: #adebe1;
             padding: 10px;
+            background-image: url('images/1.png'); /* Path to your image */
+            background-size: 200px 200px; /* Set each tile to 200px by 200px */
+            background-repeat: repeat; /* Repeat the image to create a tiled effect */
         }
         #game {
             margin: 0 auto;
@@ -48,8 +51,6 @@
             color: #555;
             margin-top: 10px;
         }
-        
-        /* Chat Styles */
         #chat-container {
             position: fixed;
             bottom: 10px;
@@ -112,6 +113,11 @@
         #chat-send:hover {
             background: #3da8d8;
         }
+        #user-count {
+            font-size: 0.8em;
+            color: #555;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -132,7 +138,7 @@
         <button id="inventory-btn">Inventory</button>
         <button id="reset-btn">Reset Game</button>
         <button id="sell-btn">Sell Inventory</button>
-        
+
         <div id="shop-menu">
             <h3>Secret Code Redemption</h3>
             <input type="text" id="code-input" placeholder="Enter code...">
@@ -142,23 +148,116 @@
         </div>
     </div>
 
-    <!-- Chat Container -->
     <div id="chat-container">
         <div id="chat-header" onclick="toggleChat()">
-            <span>Kool Kat Chat</span>
+            <span>Kool Kat Chat (<span id="user-count">1</span>)</span>
             <span id="chat-toggle">▼</span>
         </div>
         <div id="chat-content">
             <div id="chat-messages"></div>
             <div id="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Type message..." autocomplete="off">
-                <button id="chat-send">Send</button>
+                <button id="chat-send" onclick="sendMessage()">Send</button>
             </div>
+            <div id="user-count-display"></div>
         </div>
     </div>
 
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
     <script>
-        // ================= GAME DATA =================
+        // ================= SUPABASE SETUP =================
+        // Replace these with your actual Supabase credentials
+        const SUPABASE_URL = 'https://kuayqobvbmvmxyjhffcb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1YXlxb2J2Ym12bXh5amhmZmNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MDAwMDgsImV4cCI6MjA1OTI3NjAwOH0.JCiCK4eK0o3EeodD-ux5ewBPWiLU1koBqUxgqb0pTXY';
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // ================= CHAT FUNCTIONS =================
+        let username = `Fisher${Math.floor(Math.random() * 1000)}`;
+        let userCount = 1;
+
+        // Initialize chat
+        async function initChat() {
+            // Load previous messages
+            const { data: messages, error } = await supabase
+                .from('messages')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (messages) {
+                messages.reverse().forEach(displayMessage);
+            }
+
+            // Set up realtime subscription
+            const channel = supabase
+                .channel('messages')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'messages'
+                    },
+                    (payload) => {
+                        displayMessage(payload.new);
+                    }
+                )
+                .subscribe();
+        }
+
+        function displayMessage(message) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.innerHTML = `<strong>${message.username}:</strong> ${message.message}`;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (message) {
+                const { error } = await supabase
+                    .from('messages')
+                    .insert([
+                        {
+                            username: username,
+                            message: message
+                        }
+                    ]);
+
+                if (!error) {
+                    input.value = '';
+                }
+            }
+        }
+
+        function toggleChat() {
+            const chatContent = document.getElementById('chat-content');
+            const chatToggle = document.getElementById('chat-toggle');
+            if (chatContent.style.display === 'block') {
+                chatContent.style.display = 'none';
+                chatToggle.textContent = '▼';
+            } else {
+                chatContent.style.display = 'block';
+                chatToggle.textContent = '▲';
+                document.getElementById('chat-input').focus();
+            }
+        }
+
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Initialize chat when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initChat();
+        });
+
+        // ================= YOUR ORIGINAL GAME CODE =================
         const fishData = {
             "Pufferfish": "rare",
             "Mermaid's Hair": "legendary",
@@ -294,7 +393,7 @@
             "EXOTIC": { fish: "Bass's Controller", message: "🎮 Rare exotic item added!" },
             "JOAQUIN": { fish: "joaquin's fish", money: 100, message: "FREE JOAQUIN FISH" },
             "GOLDMINE": { fish: "Goldfish", quantity: 10, message: "🏆 Gold rush!" },
-            "MYSTERY": { 
+            "MYSTERY": {
                 effect: () => {
                     const randomExotic = Object.keys(fishData).filter(f => fishData[f] === "exotic");
                     const reward = randomExotic[Math.floor(Math.random() * randomExotic.length)];
@@ -304,73 +403,32 @@
             }
         };
 
-        // ================= GAME STATE =================
         let inventory = [];
         let money = 100;
-        let username = `Fisher${Math.floor(Math.random() * 1000)}`;
 
-        // ================= DOM ELEMENTS =================
         const outputEl = document.getElementById("output");
         const moneyEl = document.getElementById("money-display");
         const inventoryCountEl = document.getElementById("inventory-count");
         const shopMenuEl = document.getElementById("shop-menu");
         const codeInputEl = document.getElementById("code-input");
 
-        // ================= CHAT FUNCTIONS =================
-        function toggleChat() {
-            const chatContent = document.getElementById('chat-content');
-            const chatToggle = document.getElementById('chat-toggle');
-            if (chatContent.style.display === 'block') {
-                chatContent.style.display = 'none';
-                chatToggle.textContent = '▼';
-            } else {
-                chatContent.style.display = 'block';
-                chatToggle.textContent = '▲';
-                document.getElementById('chat-input').focus();
-                loadChatMessages();
-            }
-        }
+        document.addEventListener("DOMContentLoaded", () => {
+            loadGame();
+            updateUI();
 
-        function loadChatMessages() {
-            const messagesDiv = document.getElementById('chat-messages');
-            messagesDiv.innerHTML = '';
-            
-            // Load messages from localStorage
-            const messages = JSON.parse(localStorage.getItem('fishingGameChat') || '[]');
-            messages.forEach(msg => {
-                const messageElement = document.createElement('div');
-                messageElement.className = 'message';
-                messageElement.innerHTML = `<strong>${msg.username}:</strong> ${msg.text}`;
-                messagesDiv.appendChild(messageElement);
-            });
-            
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
+            document.getElementById("fish-btn").addEventListener("click", fish);
+            document.getElementById("shop-btn").addEventListener("click", toggleShop);
+            document.getElementById("inventory-btn").addEventListener("click", showInventory);
+            document.getElementById("reset-btn").addEventListener("click", resetGame);
+            document.getElementById("sell-btn").addEventListener("click", sellInventory);
+            document.getElementById("redeem-btn").addEventListener("click", redeemCode);
+            document.getElementById("close-shop").addEventListener("click", toggleShop);
+        });
 
-        function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (message) {
-                // Save message to localStorage
-                const messages = JSON.parse(localStorage.getItem('fishingGameChat') || '[]');
-                messages.push({
-                    username: username,
-                    text: message,
-                    timestamp: new Date().getTime()
-                });
-                localStorage.setItem('fishingGameChat', JSON.stringify(messages));
-                
-                // Display the new message
-                loadChatMessages();
-                input.value = '';
-            }
-        }
-
-        // ================= GAME FUNCTIONS =================
         function fish() {
             const rarity = weightedRandom(rarityWeights);
             const eligibleFish = Object.keys(fishData).filter(fish => fishData[fish] === rarity);
-            
+
             if (eligibleFish.length === 0) {
                 outputEl.innerHTML = `⚡ Glitch! No ${rarity} fish found.`;
                 return;
@@ -405,12 +463,12 @@
 
             if (secretCodes[code]) {
                 const reward = secretCodes[code];
-                
+
                 if (reward.money) {
                     money += reward.money;
                     outputEl.innerHTML = reward.message + ` +$${reward.money}`;
                 }
-                
+
                 if (reward.fish) {
                     const quantity = reward.quantity || 1;
                     for (let i = 0; i < quantity; i++) {
@@ -418,11 +476,11 @@
                     }
                     outputEl.innerHTML = reward.message + ` (${quantity}x ${reward.fish})`;
                 }
-                
+
                 if (reward.effect) {
                     outputEl.innerHTML = reward.effect();
                 }
-                
+
                 codeInputEl.value = "";
                 saveGame();
                 updateUI();
@@ -527,27 +585,8 @@
             moneyEl.textContent = money;
             inventoryCountEl.textContent = inventory.length;
         }
-
-        // ================= INITIALIZATION =================
-        document.addEventListener("DOMContentLoaded", () => {
-            loadGame();
-            updateUI();
-
-            // Game button event listeners
-            document.getElementById("fish-btn").addEventListener("click", fish);
-            document.getElementById("shop-btn").addEventListener("click", toggleShop);
-            document.getElementById("inventory-btn").addEventListener("click", showInventory);
-            document.getElementById("reset-btn").addEventListener("click", resetGame);
-            document.getElementById("sell-btn").addEventListener("click", sellInventory);
-            document.getElementById("redeem-btn").addEventListener("click", redeemCode);
-            document.getElementById("close-shop").addEventListener("click", toggleShop);
-            
-            // Chat button event listeners
-            document.getElementById("chat-send").addEventListener("click", sendMessage);
-            document.getElementById("chat-input").addEventListener("keypress", function(e) {
-                if (e.key === "Enter") sendMessage();
-            });
-        });
     </script>
 </body>
 </html>
+
+
