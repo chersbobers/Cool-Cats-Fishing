@@ -48,6 +48,30 @@
             color: #555;
             margin-top: 10px;
         }
+        /* Mini-game styles */
+        #mini-game-display {
+            margin: 15px 0;
+            padding: 10px;
+            background: #e0f7fa;
+            border: 2px solid #018c7c;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #mini-game-timer {
+            height: 5px;
+            background: #018c7c;
+            width: 100%;
+            transition: width 2000ms linear;
+        }
+        .key-to-press {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 15px;
+            background: #4fc3f7;
+            border-radius: 5px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -98,6 +122,10 @@
         let inventory = [];
         let money = 100;
         let currentFish = null;
+        let miniGameActive = false;
+        let miniGameTimeout;
+        const miniGameDuration = 2000; // 2 seconds to react
+        const miniGameKeys = ['A', 'S', 'D', 'F', 'J', 'K', 'L']; // Keys for the mini-game
 
         // ================= DOM ELEMENTS =================
         const outputEl = document.getElementById("output");
@@ -108,6 +136,8 @@
 
         // ================= GAME FUNCTIONS =================
         function fish() {
+            if (miniGameActive) return; // Prevent fishing during mini-game
+            
             const fishTypes = Object.keys(fishData);
             const rarityRoll = Math.random();
             
@@ -125,11 +155,74 @@
             }
 
             currentFish = eligibleFish[Math.floor(Math.random() * eligibleFish.length)];
+            outputEl.innerHTML = `🎣 You hooked a <strong>${currentFish}</strong>! (${fishRarity})<br>Quick! Press the correct key!`;
+            
+            startMiniGame();
+        }
+
+        function startMiniGame() {
+            miniGameActive = true;
+            const targetKey = miniGameKeys[Math.floor(Math.random() * miniGameKeys.length)];
+            
+            // Display the key to press
+            const miniGameDisplay = document.createElement('div');
+            miniGameDisplay.id = 'mini-game-display';
+            miniGameDisplay.innerHTML = `
+                <p>Press this key to catch the fish:</p>
+                <div class="key-to-press">${targetKey}</div>
+                <div id="mini-game-timer"></div>
+            `;
+            outputEl.appendChild(miniGameDisplay);
+            
+            // Animate the timer bar
+            setTimeout(() => {
+                document.getElementById('mini-game-timer').style.width = '0%';
+            }, 50);
+            
+            // Set up keyboard listener
+            function handleKeyPress(e) {
+                if (e.key.toUpperCase() === targetKey) {
+                    miniGameSuccess();
+                }
+            }
+            
+            document.addEventListener('keydown', handleKeyPress);
+            
+            // Set timeout for failure
+            miniGameTimeout = setTimeout(() => {
+                miniGameFail();
+            }, miniGameDuration);
+            
+            // Store the handler so we can remove it later
+            miniGameTimeout.handler = handleKeyPress;
+        }
+
+        function miniGameSuccess() {
+            clearTimeout(miniGameTimeout);
+            document.removeEventListener('keydown', miniGameTimeout.handler);
+            
+            const miniGameDisplay = document.getElementById('mini-game-display');
+            if (miniGameDisplay) miniGameDisplay.remove();
+            
             inventory.push(currentFish);
-            outputEl.innerHTML = `🎣 You caught a <strong>${currentFish}</strong>! (${fishRarity})`;
+            outputEl.innerHTML = `🎉 You caught the <strong>${currentFish}</strong>!`;
+            miniGameActive = false;
             
             saveGame();
             updateUI();
+        }
+
+        function miniGameFail() {
+            clearTimeout(miniGameTimeout);
+            if (miniGameTimeout.handler) {
+                document.removeEventListener('keydown', miniGameTimeout.handler);
+            }
+            
+            const miniGameDisplay = document.getElementById('mini-game-display');
+            if (miniGameDisplay) miniGameDisplay.remove();
+            
+            outputEl.innerHTML = `😿 The <strong>${currentFish}</strong> got away!`;
+            miniGameActive = false;
         }
 
         function toggleShop() {
