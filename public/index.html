@@ -8,7 +8,9 @@
         body {
             font-family: monospace;
             padding: 10px;
-            background: #3edbf0;
+            background-image: url('1.png'); /* Ensure the path is correct */
+            background-size: 200px 200px; /* Set each tile to 200px by 200px */
+            background-repeat: repeat; /* Repeat the image to create a tiled effect */
         }
         #game {
             margin: 0 auto;
@@ -120,10 +122,10 @@
 <body>
     <div id="game">
         <pre>
-     /\_/\          ><((((º>
-    ( o.o )   FISH FOR KOOL KATS
-     ( > )    <º))))><
-      " "
+                                    /\_/\          ><((((º>
+                                   ( o.o )   FISH FOR KOOL KATS
+                                    (   )    <º))))><
+                                     " "
         </pre>
         <div>
             <p>Fish Bones: $<span id="money-display">100</span></p>
@@ -164,6 +166,7 @@
 
     <script>
         // ================= SUPABASE SETUP =================
+        // Replace these with your actual Supabase credentials
         const SUPABASE_URL = 'https://kuayqobvbmvmxyjhffcb.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1YXlxb2J2Ym12bXh5amhmZmNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MDAwMDgsImV4cCI6MjA1OTI3NjAwOH0.JCiCK4eK0o3EeodD-ux5ewBPWiLU1koBqUxgqb0pTXY';
 
@@ -171,8 +174,11 @@
 
         // ================= CHAT FUNCTIONS =================
         let username = `Fisher${Math.floor(Math.random() * 1000)}`;
+        let userCount = 1;
 
+        // Initialize chat
         async function initChat() {
+            // Load previous messages
             const { data: messages, error } = await supabase
                 .from('messages')
                 .select('*')
@@ -183,6 +189,7 @@
                 messages.reverse().forEach(displayMessage);
             }
 
+            // Set up realtime subscription
             const channel = supabase
                 .channel('messages')
                 .on(
@@ -214,9 +221,16 @@
             if (message) {
                 const { error } = await supabase
                     .from('messages')
-                    .insert([{ username: username, message: message }]);
+                    .insert([
+                        {
+                            username: username,
+                            message: message
+                        }
+                    ]);
 
-                if (!error) input.value = '';
+                if (!error) {
+                    input.value = '';
+                }
             }
         }
 
@@ -233,7 +247,16 @@
             }
         }
 
-        // ================= GAME FUNCTIONS =================
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Initialize chat when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initChat();
+        });
+
+        // ================= YOUR ORIGINAL GAME CODE =================
         const fishData = {
             "Pufferfish": "rare",
             "Mermaid's Hair": "legendary",
@@ -381,8 +404,6 @@
 
         let inventory = [];
         let money = 100;
-        let currentFish = null;
-        let miniGameTimeout = null;
 
         const outputEl = document.getElementById("output");
         const moneyEl = document.getElementById("money-display");
@@ -393,7 +414,6 @@
         document.addEventListener("DOMContentLoaded", () => {
             loadGame();
             updateUI();
-            initChat();
 
             document.getElementById("fish-btn").addEventListener("click", fish);
             document.getElementById("shop-btn").addEventListener("click", toggleShop);
@@ -404,16 +424,6 @@
             document.getElementById("close-shop").addEventListener("click", toggleShop);
         });
 
-        function weightedRandom(weights) {
-            let sum = 0;
-            const r = Math.random();
-            for (const rarity in weights) {
-                sum += weights[rarity];
-                if (r <= sum) return rarity;
-            }
-            return "common";
-        }
-
         function fish() {
             const rarity = weightedRandom(rarityWeights);
             const eligibleFish = Object.keys(fishData).filter(fish => fishData[fish] === rarity);
@@ -423,9 +433,21 @@
                 return;
             }
 
-            currentFish = eligibleFish[Math.floor(Math.random() * eligibleFish.length)];
-            outputEl.innerHTML = `🎣 You hooked a <strong>${currentFish}</strong> (${rarity})! Type the code to catch it!`;
-            startMiniGame();
+            const caughtFish = eligibleFish[Math.floor(Math.random() * eligibleFish.length)];
+            inventory.push(caughtFish);
+            outputEl.innerHTML = `🎣 You caught a <strong>${caughtFish}</strong> (${rarity})!`;
+            saveGame();
+            updateUI();
+        }
+
+        function weightedRandom(weights) {
+            let sum = 0;
+            const rand = Math.random();
+            for (const [rarity, weight] of Object.entries(weights)) {
+                sum += weight;
+                if (rand <= sum) return rarity;
+            }
+            return "common";
         }
 
         function toggleShop() {
@@ -434,78 +456,36 @@
             codeInputEl.focus();
         }
 
-        function startMiniGame() {
-            const randomCode = generateRandomCode(5);
-            const miniGameEl = document.createElement('div');
-            miniGameEl.id = 'mini-game';
-            miniGameEl.innerHTML = `
-                <p>Type this code within 5 seconds: <strong>${randomCode}</strong></p>
-                <input type="text" id="mini-game-input" placeholder="Type code here..." />
-                <button id="submit-mini-game">Submit</button>
-            `;
-            outputEl.appendChild(miniGameEl);
-
-            const inputEl = document.getElementById('mini-game-input');
-            const submitBtn = document.getElementById('submit-mini-game');
-
-            inputEl.focus();
-
-            submitBtn.addEventListener('click', () => {
-                checkMiniGameResult(inputEl.value, randomCode);
-            });
-
-            miniGameTimeout = setTimeout(() => {
-                checkMiniGameResult(null, randomCode);
-            }, 5000);
-        }
-
-        function generateRandomCode(length) {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            return result;
-        }
-
-        function checkMiniGameResult(input, correctCode) {
-            clearTimeout(miniGameTimeout);
-            const miniGameEl = document.getElementById('mini-game');
-            if (miniGameEl) miniGameEl.remove();
-
-            if (input && input.toUpperCase() === correctCode) {
-                inventory.push(currentFish);
-                updateUI();
-                outputEl.innerHTML = `🎉 You caught the <strong>${currentFish}</strong>!`;
-            } else {
-                outputEl.innerHTML = `😿 The <strong>${currentFish}</strong> got away!`;
-            }
-            currentFish = null;
-        }
-
         function redeemCode() {
             const code = codeInputEl.value.trim().toUpperCase();
             if (!code) return;
 
             if (secretCodes[code]) {
                 const reward = secretCodes[code];
+
                 if (reward.money) {
                     money += reward.money;
-                    outputEl.innerHTML = reward.message;
-                } else if (reward.fish) {
+                    outputEl.innerHTML = reward.message + ` +$${reward.money}`;
+                }
+
+                if (reward.fish) {
                     const quantity = reward.quantity || 1;
                     for (let i = 0; i < quantity; i++) {
                         inventory.push(reward.fish);
                     }
-                    outputEl.innerHTML = reward.message;
-                } else if (reward.effect) {
+                    outputEl.innerHTML = reward.message + ` (${quantity}x ${reward.fish})`;
+                }
+
+                if (reward.effect) {
                     outputEl.innerHTML = reward.effect();
                 }
+
+                codeInputEl.value = "";
+                saveGame();
                 updateUI();
             } else {
-                outputEl.innerHTML = "❌ Invalid code!";
+                outputEl.innerHTML = "❌ Invalid code! Try another.";
             }
-            codeInputEl.value = "";
         }
 
         function showInventory() {
@@ -514,75 +494,95 @@
                 return;
             }
 
-            let inventoryList = "<h3>Your Inventory:</h3><ul>";
-            const counts = {};
-            inventory.forEach(item => {
+            const itemCounts = inventory.reduce((counts, item) => {
                 counts[item] = (counts[item] || 0) + 1;
+                return counts;
+            }, {});
+
+            const inventoryList = Object.entries(itemCounts)
+                .map(([item, count]) => {
+                    const rarity = fishData[item];
+                    return count > 1
+                        ? `${item} (x${count}, ${rarity})`
+                        : `${item} (${rarity})`;
+                })
+                .join(", ");
+
+            const rarityCounts = {};
+            inventory.forEach(item => {
+                const rarity = fishData[item];
+                rarityCounts[rarity] = (rarityCounts[rarity] || 0) + 1;
             });
 
-            for (const item in counts) {
-                inventoryList += `<li>${item} (${counts[item]})</li>`;
-            }
-            inventoryList += "</ul>";
-            outputEl.innerHTML = inventoryList;
+            const raritySummary = Object.entries(rarityCounts)
+                .map(([rarity, count]) => `${rarity}: ${count}`)
+                .join(" | ");
+
+            outputEl.innerHTML = `
+                <strong>Inventory:</strong> ${inventoryList}<br>
+                <strong>Rarities:</strong> ${raritySummary}
+            `;
         }
 
         function sellInventory() {
             if (inventory.length === 0) {
-                outputEl.innerHTML = "Nothing to sell!";
+                outputEl.innerHTML = "Your inventory is empty! Nothing to sell.";
                 return;
             }
 
-            let total = 0;
+            const rarityValues = {
+                "common": 5,
+                "uncommon": 10,
+                "rare": 20,
+                "legendary": 300,
+                "exotic": 100000,
+                "lucky": 10000000,
+                "no": 0
+            };
+
+            let totalValue = 0;
             inventory.forEach(item => {
                 const rarity = fishData[item];
-                switch (rarity) {
-                    case "common": total += 5; break;
-                    case "uncommon": total += 15; break;
-                    case "rare": total += 50; break;
-                    case "legendary": total += 200; break;
-                    case "exotic": total += 500; break;
-                    case "lucky": total += 1000; break;
-                    default: total += 1;
-                }
+                totalValue += rarityValues[rarity] || 0;
             });
 
-            money += total;
+            money += totalValue;
             inventory = [];
-            outputEl.innerHTML = `💰 Sold all fish for $${total}!`;
+            saveGame();
             updateUI();
+
+            outputEl.innerHTML = `💰 You sold all your fish for $${totalValue}!`;
+        }
+
+        function saveGame() {
+            localStorage.setItem('fishingGameSave', JSON.stringify({
+                inventory: inventory,
+                money: money
+            }));
+        }
+
+        function loadGame() {
+            const saveData = localStorage.getItem('fishingGameSave');
+            if (saveData) {
+                const { inventory: savedInv, money: savedMoney } = JSON.parse(saveData);
+                inventory = savedInv || [];
+                money = savedMoney || 100;
+            }
         }
 
         function resetGame() {
             if (confirm("Are you sure you want to reset your game?")) {
-                money = 100;
                 inventory = [];
+                money = 100;
+                saveGame();
                 updateUI();
                 outputEl.innerHTML = "Game reset!";
             }
         }
 
-        function loadGame() {
-            const savedGame = localStorage.getItem('fishingGame');
-            if (savedGame) {
-                const gameData = JSON.parse(savedGame);
-                money = gameData.money || money;
-                inventory = gameData.inventory || inventory;
-            }
-        }
-
-        function saveGame() {
-            const gameData = {
-                money: money,
-                inventory: inventory
-            };
-            localStorage.setItem('fishingGame', JSON.stringify(gameData));
-        }
-
         function updateUI() {
             moneyEl.textContent = money;
             inventoryCountEl.textContent = inventory.length;
-            saveGame();
         }
     </script>
 </body>
