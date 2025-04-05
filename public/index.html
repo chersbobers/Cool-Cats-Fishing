@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title> Hard Math +x= </title>
+    <title> Fish </title>
     <style>
         body {
             font-family: monospace;
@@ -11,7 +11,7 @@
         #game {
             margin: 0 auto;
             padding: 20px;
-            border: 3px dashed #018c7c;
+            border: 3px #018c7c;
             max-width: 600px;
             background: white;
         }
@@ -135,10 +135,10 @@
         // ================= GAME FUNCTIONS =================
         function fish() {
             if (miniGameActive) return;
-            
+
             const fishTypes = Object.keys(fishData);
             const rarityRoll = Math.random();
-            
+
             let fishRarity;
             if (rarityRoll < 0.6) fishRarity = "common";
             else if (rarityRoll < 0.9) fishRarity = "uncommon";
@@ -146,7 +146,7 @@
             else fishRarity = "legendary";
 
             const eligibleFish = fishTypes.filter(fish => fishData[fish].rarity === fishRarity);
-            
+
             if (eligibleFish.length === 0) {
                 outputEl.innerHTML = "⚡ No fish available!";
                 return;
@@ -154,14 +154,14 @@
 
             currentFish = eligibleFish[Math.floor(Math.random() * eligibleFish.length)];
             outputEl.innerHTML = `🎣 You hooked a <strong>${currentFish}</strong>! (${fishRarity})<br>Quick! Press the correct key!`;
-            
+
             startMiniGame();
         }
 
         function startMiniGame() {
             miniGameActive = true;
             const targetKey = miniGameKeys[Math.floor(Math.random() * miniGameKeys.length)];
-            
+
             const miniGameDisplay = document.createElement('div');
             miniGameDisplay.id = 'mini-game-display';
             miniGameDisplay.innerHTML = `
@@ -170,11 +170,11 @@
                 <div id="mini-game-timer"></div>
             `;
             outputEl.appendChild(miniGameDisplay);
-            
+
             setTimeout(() => {
                 document.getElementById('mini-game-timer').style.width = '0%';
             }, 50);
-            
+
             function handleKeyPress(e) {
                 const pressedKey = e.key.toUpperCase();
                 if (pressedKey === targetKey) {
@@ -183,27 +183,27 @@
                     miniGameFail();
                 }
             }
-            
+
             document.addEventListener('keydown', handleKeyPress);
-            
+
             miniGameTimeout = setTimeout(() => {
                 miniGameFail();
             }, miniGameDuration);
-            
+
             miniGameTimeout.handler = handleKeyPress;
         }
 
         function miniGameSuccess() {
             clearTimeout(miniGameTimeout);
             document.removeEventListener('keydown', miniGameTimeout.handler);
-            
+
             const miniGameDisplay = document.getElementById('mini-game-display');
             if (miniGameDisplay) miniGameDisplay.remove();
-            
+
             inventory.push(currentFish);
             outputEl.innerHTML = `🎉 You caught the <strong>${currentFish}</strong>!`;
             miniGameActive = false;
-            
+
             saveGame();
             updateUI();
         }
@@ -213,10 +213,10 @@
             if (miniGameTimeout.handler) {
                 document.removeEventListener('keydown', miniGameTimeout.handler);
             }
-            
+
             const miniGameDisplay = document.getElementById('mini-game-display');
             if (miniGameDisplay) miniGameDisplay.remove();
-            
+
             outputEl.innerHTML = `😿 The <strong>${currentFish}</strong> got away!`;
             miniGameActive = false;
         }
@@ -267,7 +267,7 @@
                 inventoryHTML += `<li>${fish} (${inventoryCounts[fish]}) - $${fishData[fish]?.value || 10} each</li>`;
             }
             inventoryHTML += "</ul>";
-            
+
             outputEl.innerHTML = inventoryHTML;
         }
 
@@ -285,7 +285,7 @@
             money += totalValue;
             inventory = [];
             outputEl.innerHTML = `💰 Sold all fish for $${totalValue}!`;
-            
+
             saveGame();
             updateUI();
         }
@@ -324,8 +324,6 @@
             moneyEl.textContent = money;
             inventoryCountEl.textContent = inventory.length;
         }
-
-        // ================= INITIALIZE GAME =================
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("fish-btn").addEventListener("click", fish);
             document.getElementById("shop-btn").addEventListener("click", toggleShop);
@@ -334,11 +332,11 @@
             document.getElementById("reset-btn").addEventListener("click", resetGame);
             document.getElementById("redeem-btn").addEventListener("click", redeemCode);
             document.getElementById("close-shop").addEventListener("click", toggleShop);
-            
+
             loadGame();
             updateUI();
-            
-            outputEl.innerHTML = "Welcome to Fishing for Kool Kats! Click 'Cast Line!' to start fishing!";
+
+            outputEl.innerHTML = "Welcome to Cool Cats Fishing! Click 'Cast Line!' to start fishing!";
         });
     </script>
 </body>
