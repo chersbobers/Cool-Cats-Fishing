@@ -11,7 +11,7 @@
         #game {
             margin: 0 auto;
             padding: 20px;
-            border: 3px #018c7c;
+            border: 3px solid #018c7c;
             max-width: 600px;
             background: white;
         }
@@ -90,6 +90,8 @@
         <button id="inventory-btn">Inventory</button>
         <button id="reset-btn">Reset Game</button>
         <button id="sell-btn">Sell Inventory</button>
+        <button id="sell-rare-btn">Sell Rare Fish</button>
+        <button id="sell-legendary-btn">Sell Legendary Fish</button>
 
         <div id="shop-menu">
             <h3>Secret Code Redemption</h3>
@@ -103,127 +105,125 @@
     <script>
         // ================= GAME DATA =================
         const fishData = {
-            {
-              "Pufferfish": { rarity: "rare", value: 20 },
-              "Mermaid's Hair": { rarity: "legendary", value: 50 },
-              "Anglerfish": { rarity: "rare", value: 20 },
-              "Clownfish": { rarity: "common", value: 5 },
-              "Swordfish": { rarity: "rare", value: 20 },
-              "Guppy": { rarity: "common", value: 5 },
-              "Goldfish": { rarity: "common", value: 5 },
-              "Salmon": { rarity: "uncommon", value: 10 },
-              "Tuna": { rarity: "rare", value: 20 },
-              "Trout": { rarity: "uncommon", value: 10 },
-              "Catfish": { rarity: "common", value: 5 },
-              "Bass": { rarity: "uncommon", value: 10 },
-              "Piranha": { rarity: "rare", value: 20 },
-              "Barracuda": { rarity: "uncommon", value: 10 },
-              "Shark": { rarity: "legendary", value: 50 },
-              "Mahi Mahi": { rarity: "rare", value: 20 },
-              "Snapper": { rarity: "common", value: 5 },
-              "Halibut": { rarity: "uncommon", value: 10 },
-              "Perch": { rarity: "common", value: 5 },
-              "Bluegill": { rarity: "common", value: 5 },
-              "Tilapia": { rarity: "uncommon", value: 10 },
-              "Sturgeon": { rarity: "rare", value: 20 },
-              "Cod": { rarity: "common", value: 5 },
-              "Flounder": { rarity: "common", value: 5 },
-              "Mackerel": { rarity: "uncommon", value: 10 },
-              "Grouper": { rarity: "uncommon", value: 10 },
-              "Walleye": { rarity: "rare", value: 20 },
-              "Carp": { rarity: "common", value: 5 },
-              "Eel": { rarity: "uncommon", value: 10 },
-              "Pike": { rarity: "uncommon", value: 10 },
-              "Kingfish": { rarity: "rare", value: 20 },
-              "Swordtail": { rarity: "common", value: 5 },
-              "Zebra Fish": { rarity: "common", value: 5 },
-              "Betta": { rarity: "common", value: 5 },
-              "Koi": { rarity: "uncommon", value: 10 },
-              "Angelfish": { rarity: "uncommon", value: 10 },
-              "Jellyfish": { rarity: "rare", value: 20 },
-              "Lionfish": { rarity: "rare", value: 20 },
-              "Seahorse": { rarity: "uncommon", value: 10 },
-              "Starfish": { rarity: "common", value: 5 },
-              "Largemouth Bass": { rarity: "uncommon", value: 10 },
-              "Smallmouth Bass": { rarity: "uncommon", value: 10 },
-              "Rainbow Trout": { rarity: "rare", value: 20 },
-              "Channel Catfish": { rarity: "uncommon", value: 10 },
-              "Flathead Catfish": { rarity: "uncommon", value: 10 },
-              "Yellowtail": { rarity: "rare", value: 20 },
-              "Red Snapper": { rarity: "uncommon", value: 10 },
-              "Rockfish": { rarity: "uncommon", value: 10 },
-              "Sardine": { rarity: "common", value: 5 },
-              "Anchovy": { rarity: "common", value: 5 },
-              "Goby": { rarity: "common", value: 5 },
-              "Booby Fish": { rarity: "rare", value: 20 },
-              "Arowana": { rarity: "legendary", value: 50 },
-              "Arapaima": { rarity: "legendary", value: 50 },
-              "Tetra": { rarity: "common", value: 5 },
-              "Bream": { rarity: "common", value: 5 },
-              "Garfish": { rarity: "uncommon", value: 10 },
-              "Mudfish": { rarity: "uncommon", value: 10 },
-              "Shad": { rarity: "common", value: 5 },
-              "Pompano": { rarity: "rare", value: 20 },
-              "Bluefin Tuna": { rarity: "legendary", value: 50 },
-              "Giant Squid": { rarity: "legendary", value: 50 },
-              "Kelp Bass": { rarity: "uncommon", value: 10 },
-              "Caribbean Reef Fish": { rarity: "rare", value: 20 },
-              "Vampire Fish": { rarity: "legendary", value: 50 },
-              "Moonfish": { rarity: "rare", value: 20 },
-              "Fangtooth": { rarity: "rare", value: 20 },
-              "Electric Eel": { rarity: "rare", value: 20 },
-              "Butterfly Fish": { rarity: "uncommon", value: 10 },
-              "Whale Shark": { rarity: "legendary", value: 50 },
-              "Angel Shark": { rarity: "rare", value: 20 },
-              "Goblin Shark": { rarity: "rare", value: 20 },
-              "Spiny Lobster": { rarity: "uncommon", value: 10 },
-              "Tigerfish": { rarity: "rare", value: 20 },
-              "Chub": { rarity: "common", value: 5 },
-              "Bassa Fish": { rarity: "uncommon", value: 10 },
-              "Cobia": { rarity: "rare", value: 20 },
-              "Lumpfish": { rarity: "common", value: 5 },
-              "Cusk": { rarity: "uncommon", value: 10 },
-              "Coral Trout": { rarity: "rare", value: 20 },
-              "Codling": { rarity: "common", value: 5 },
-              "Stonefish": { rarity: "rare", value: 20 },
-              "Cuttlefish": { rarity: "uncommon", value: 10 },
-              "Greenhouse Fish": { rarity: "uncommon", value: 10 },
-              "Gold-Dust Molly": { rarity: "common", value: 5 },
-              "Siamese Fighting Fish": { rarity: "common", value: 5 },
-              "Sea Bass": { rarity: "uncommon", value: 10 },
-              "Whitefish": { rarity: "common", value: 5 },
-              "Ocean Sunfish": { rarity: "rare", value: 20 },
-              "Blue Marlin": { rarity: "legendary", value: 50 },
-              "Mullet": { rarity: "common", value: 5 },
-              "Mudskipper": { rarity: "uncommon", value: 10 },
-              "Whiting": { rarity: "common", value: 5 },
-              "Triggerfish": { rarity: "rare", value: 20 },
-              "Spotted Trout": { rarity: "uncommon", value: 10 },
-              "Rainbow Fish": { rarity: "uncommon", value: 10 },
-              "Blackfish": { rarity: "uncommon", value: 10 },
-              "Dorado": { rarity: "rare", value: 20 },
-              "Blowfish": { rarity: "uncommon", value: 10 },
-              "Bass's Controller": { rarity: "legendary", value: 50 },
-              "Carter's Keybard": { rarity: "legendary", value: 50 },
-              "Charlie's Code": { rarity: "legendary", value: 50 },
-              "Nero Sitter of sinks": { rarity: "legendary", value: 50 },
-              "Nero's rod": { rarity: "lucky", value: 100 },
-              "Noodle Maker of biscuits": { rarity: "legendary", value: 50 },
-              "Noodle's rod": { rarity: "lucky", value: 100 },
-              "Max the good boy": { rarity: "legendary", value: 50 },
-              "test": { rarity: "no", value: 0 },
-              "luka's fish": { rarity: "legendary", value: 50 },
-              "will's fish": { rarity: "legendary", value: 50 },
-              "joaquin's fish": { rarity: "legendary", value: 50 },
-              "TeN pAcKeT's Of HuBbu BaBbAa": { rarity: "rare", value: 20 }
-}
-
+            "Pufferfish": { rarity: "rare", value: 20 },
+            "Mermaid's Hair": { rarity: "legendary", value: 50 },
+            "Anglerfish": { rarity: "rare", value: 20 },
+            "Clownfish": { rarity: "common", value: 5 },
+            "Swordfish": { rarity: "rare", value: 20 },
+            "Guppy": { rarity: "common", value: 5 },
+            "Goldfish": { rarity: "common", value: 5 },
+            "Salmon": { rarity: "uncommon", value: 10 },
+            "Tuna": { rarity: "rare", value: 20 },
+            "Trout": { rarity: "uncommon", value: 10 },
+            "Catfish": { rarity: "common", value: 5 },
+            "Bass": { rarity: "uncommon", value: 10 },
+            "Piranha": { rarity: "rare", value: 20 },
+            "Barracuda": { rarity: "uncommon", value: 10 },
+            "Shark": { rarity: "legendary", value: 50 },
+            "Mahi Mahi": { rarity: "rare", value: 20 },
+            "Snapper": { rarity: "common", value: 5 },
+            "Halibut": { rarity: "uncommon", value: 10 },
+            "Perch": { rarity: "common", value: 5 },
+            "Bluegill": { rarity: "common", value: 5 },
+            "Tilapia": { rarity: "uncommon", value: 10 },
+            "Sturgeon": { rarity: "rare", value: 20 },
+            "Cod": { rarity: "common", value: 5 },
+            "Flounder": { rarity: "common", value: 5 },
+            "Mackerel": { rarity: "uncommon", value: 10 },
+            "Grouper": { rarity: "uncommon", value: 10 },
+            "Walleye": { rarity: "rare", value: 20 },
+            "Carp": { rarity: "common", value: 5 },
+            "Eel": { rarity: "uncommon", value: 10 },
+            "Pike": { rarity: "uncommon", value: 10 },
+            "Kingfish": { rarity: "rare", value: 20 },
+            "Swordtail": { rarity: "common", value: 5 },
+            "Zebra Fish": { rarity: "common", value: 5 },
+            "Betta": { rarity: "common", value: 5 },
+            "Koi": { rarity: "uncommon", value: 10 },
+            "Angelfish": { rarity: "uncommon", value: 10 },
+            "Jellyfish": { rarity: "rare", value: 20 },
+            "Lionfish": { rarity: "rare", value: 20 },
+            "Seahorse": { rarity: "uncommon", value: 10 },
+            "Starfish": { rarity: "common", value: 5 },
+            "Largemouth Bass": { rarity: "uncommon", value: 10 },
+            "Smallmouth Bass": { rarity: "uncommon", value: 10 },
+            "Rainbow Trout": { rarity: "rare", value: 20 },
+            "Channel Catfish": { rarity: "uncommon", value: 10 },
+            "Flathead Catfish": { rarity: "uncommon", value: 10 },
+            "Yellowtail": { rarity: "rare", value: 20 },
+            "Red Snapper": { rarity: "uncommon", value: 10 },
+            "Rockfish": { rarity: "uncommon", value: 10 },
+            "Sardine": { rarity: "common", value: 5 },
+            "Anchovy": { rarity: "common", value: 5 },
+            "Goby": { rarity: "common", value: 5 },
+            "Booby Fish": { rarity: "rare", value: 20 },
+            "Arowana": { rarity: "legendary", value: 50 },
+            "Arapaima": { rarity: "legendary", value: 50 },
+            "Tetra": { rarity: "common", value: 5 },
+            "Bream": { rarity: "common", value: 5 },
+            "Garfish": { rarity: "uncommon", value: 10 },
+            "Mudfish": { rarity: "uncommon", value: 10 },
+            "Shad": { rarity: "common", value: 5 },
+            "Pompano": { rarity: "rare", value: 20 },
+            "Bluefin Tuna": { rarity: "legendary", value: 50 },
+            "Giant Squid": { rarity: "legendary", value: 50 },
+            "Kelp Bass": { rarity: "uncommon", value: 10 },
+            "Caribbean Reef Fish": { rarity: "rare", value: 20 },
+            "Vampire Fish": { rarity: "legendary", value: 50 },
+            "Moonfish": { rarity: "rare", value: 20 },
+            "Fangtooth": { rarity: "rare", value: 20 },
+            "Electric Eel": { rarity: "rare", value: 20 },
+            "Butterfly Fish": { rarity: "uncommon", value: 10 },
+            "Whale Shark": { rarity: "legendary", value: 50 },
+            "Angel Shark": { rarity: "rare", value: 20 },
+            "Goblin Shark": { rarity: "rare", value: 20 },
+            "Spiny Lobster": { rarity: "uncommon", value: 10 },
+            "Tigerfish": { rarity: "rare", value: 20 },
+            "Chub": { rarity: "common", value: 5 },
+            "Bassa Fish": { rarity: "uncommon", value: 10 },
+            "Cobia": { rarity: "rare", value: 20 },
+            "Lumpfish": { rarity: "common", value: 5 },
+            "Cusk": { rarity: "uncommon", value: 10 },
+            "Coral Trout": { rarity: "rare", value: 20 },
+            "Codling": { rarity: "common", value: 5 },
+            "Stonefish": { rarity: "rare", value: 20 },
+            "Cuttlefish": { rarity: "uncommon", value: 10 },
+            "Greenhouse Fish": { rarity: "uncommon", value: 10 },
+            "Gold-Dust Molly": { rarity: "common", value: 5 },
+            "Siamese Fighting Fish": { rarity: "common", value: 5 },
+            "Sea Bass": { rarity: "uncommon", value: 10 },
+            "Whitefish": { rarity: "common", value: 5 },
+            "Ocean Sunfish": { rarity: "rare", value: 20 },
+            "Blue Marlin": { rarity: "legendary", value: 50 },
+            "Mullet": { rarity: "common", value: 5 },
+            "Mudskipper": { rarity: "uncommon", value: 10 },
+            "Whiting": { rarity: "common", value: 5 },
+            "Triggerfish": { rarity: "rare", value: 20 },
+            "Spotted Trout": { rarity: "uncommon", value: 10 },
+            "Rainbow Fish": { rarity: "uncommon", value: 10 },
+            "Blackfish": { rarity: "uncommon", value: 10 },
+            "Dorado": { rarity: "rare", value: 20 },
+            "Blowfish": { rarity: "uncommon", value: 10 },
+            "Bass's Controller": { rarity: "legendary", value: 50 },
+            "Carter's Keybard": { rarity: "legendary", value: 50 },
+            "Charlie's Code": { rarity: "legendary", value: 50 },
+            "Nero Sitter of sinks": { rarity: "legendary", value: 50 },
+            "Nero's rod": { rarity: "lucky", value: 100 },
+            "Noodle Maker of biscuits": { rarity: "legendary", value: 50 },
+            "Noodle's rod": { rarity: "lucky", value: 100 },
+            "Max the good boy": { rarity: "legendary", value: 50 },
+            "test": { rarity: "no", value: 0 },
+            "luka's fish": { rarity: "legendary", value: 50 },
+            "will's fish": { rarity: "legendary", value: 50 },
+            "joaquin's fish": { rarity: "legendary", value: 50 },
+            "TeN pAcKeT's Of HuBbu BaBbAa": { rarity: "rare", value: 20 }
         };
 
         const secretCodes = {
             "KOOLKATS": { money: 500, message: "🐱 Meow! Kool Kats bonus!" },
             "LEGENDARY": { fish: "Shark", message: "🦈 Legendary fish unlocked!" },
-            "RICH": { money: 1000, message: "💰 You're rich now!" }
+            "RICH": { money: 1000, message: "💰 You're rich now!" },
+            "EXOTIC": { fish: "Bass's Controller", message: "🎮 You got Bass's Controller!" }
         };
 
         // ================= GAME STATE =================
@@ -332,7 +332,6 @@
             miniGameActive = false;
         }
 
-        // [Rest of your existing functions remain exactly the same...]
         function toggleShop() {
             shopMenuEl.style.display = shopMenuEl.style.display === "block" ? "none" : "block";
             outputEl.innerHTML = shopMenuEl.style.display === "block" ? "Enter a secret code!" : "";
@@ -401,6 +400,66 @@
             updateUI();
         }
 
+        function sellRareFish() {
+            if (inventory.length === 0) {
+                outputEl.innerHTML = "Your inventory is empty!";
+                return;
+            }
+
+            let totalValue = 0;
+            const remainingFish = [];
+            
+            inventory.forEach(fish => {
+                if (fishData[fish]?.rarity === "rare" || fishData[fish]?.rarity === "legendary") {
+                    totalValue += fishData[fish]?.value || 20;
+                } else {
+                    remainingFish.push(fish);
+                }
+            });
+
+            if (totalValue === 0) {
+                outputEl.innerHTML = "No rare or legendary fish to sell!";
+                return;
+            }
+
+            money += totalValue;
+            inventory = remainingFish;
+            outputEl.innerHTML = `💰 Sold rare/legendary fish for $${totalValue}!`;
+
+            saveGame();
+            updateUI();
+        }
+
+        function sellLegendaryFish() {
+            if (inventory.length === 0) {
+                outputEl.innerHTML = "Your inventory is empty!";
+                return;
+            }
+
+            let totalValue = 0;
+            const remainingFish = [];
+            
+            inventory.forEach(fish => {
+                if (fishData[fish]?.rarity === "legendary") {
+                    totalValue += fishData[fish]?.value || 50;
+                } else {
+                    remainingFish.push(fish);
+                }
+            });
+
+            if (totalValue === 0) {
+                outputEl.innerHTML = "No legendary fish to sell!";
+                return;
+            }
+
+            money += totalValue;
+            inventory = remainingFish;
+            outputEl.innerHTML = `💰 Sold legendary fish for $${totalValue}!`;
+
+            saveGame();
+            updateUI();
+        }
+
         function resetGame() {
             if (confirm("Are you sure you want to reset your game?")) {
                 inventory = [];
@@ -435,11 +494,14 @@
             moneyEl.textContent = money;
             inventoryCountEl.textContent = inventory.length;
         }
+
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("fish-btn").addEventListener("click", fish);
             document.getElementById("shop-btn").addEventListener("click", toggleShop);
             document.getElementById("inventory-btn").addEventListener("click", showInventory);
             document.getElementById("sell-btn").addEventListener("click", sellInventory);
+            document.getElementById("sell-rare-btn").addEventListener("click", sellRareFish);
+            document.getElementById("sell-legendary-btn").addEventListener("click", sellLegendaryFish);
             document.getElementById("reset-btn").addEventListener("click", resetGame);
             document.getElementById("redeem-btn").addEventListener("click", redeemCode);
             document.getElementById("close-shop").addEventListener("click", toggleShop);
