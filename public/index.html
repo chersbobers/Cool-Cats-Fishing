@@ -84,10 +84,10 @@
 <body>
     <div id="game">
         <pre>
-                                /\_/\          ><((((º>
-                               ( o.o )  🐱 Cool Cats Fishing 🐱
-                                (   )    <º))))><
-                                 " "
+                                    /\_/\          ><((((º>
+                                   ( o.o )  🐱 Cool Cats Fishing 🐱
+                                    (   )    <º))))><
+                                     " "
         </pre>
         <div>
             <p>Fish Bones: $<span id="money-display">100</span></p>
@@ -447,7 +447,7 @@
             const remainingFish = [];
             
             inventory.forEach(fish => {
-                if (fishData[fish]?.rarity === "rare"{
+                if (fishData[fish]?.rarity === "rare" || fishData[fish]?.rarity === "legendary") {
                     totalValue += fishData[fish]?.value || 20;
                 } else {
                     remainingFish.push(fish);
@@ -455,7 +455,7 @@
             });
 
             if (totalValue === 0) {
-                outputEl.innerHTML = "No rare or fish to sell!";
+                outputEl.innerHTML = "No rare or legendary fish to sell!";
                 return;
             }
 
@@ -551,3 +551,4 @@
     </script>
 </body>
 </html>
+                                        \
