@@ -399,76 +399,23 @@
         }
 
         function showInventory() {
-              if (inventory.length === 0) {
-        outputEl.innerHTML = "Your inventory is empty!";
-        return;
-    }
+            if (inventory.length === 0) {
+                outputEl.innerHTML = "Your inventory is empty!";
+                return;
+            }
 
-    const inventoryCounts = {};
-    inventory.forEach(fish => {
-        inventoryCounts[fish] = (inventoryCounts[fish] || 0) + 1;
-    });
+            const inventoryCounts = {};
+            inventory.forEach(fish => {
+                inventoryCounts[fish] = (inventoryCounts[fish] || 0) + 1;
+            });
 
-    let inventoryHTML = "<h3>Your Inventory:</h3><ul>";
-    for (const fish in inventoryCounts) {
-        inventoryHTML += `<li>${fish} (${inventoryCounts[fish]})</li>`;
-    }
-    inventoryHTML += "</ul>";
+            let inventoryHTML = "<h3>Your Inventory:</h3><ul>";
+            for (const fish in inventoryCounts) {
+                inventoryHTML += `<li>${fish} (${inventoryCounts[fish]}) - $${fishData[fish]?.value || 10} each</li>`;
+            }
+            inventoryHTML += "</ul>";
 
-    outputEl.innerHTML = inventoryHTML;
-}
-And here's that same code, but now with guts, glamour, and an actual point in life:
-
-js
-Copy
-Edit
-function showInventory() {
-    if (inventory.length === 0) {
-        outputEl.innerHTML = "Your inventory is empty!";
-        return;
-    }
-
-    const inventoryCounts = {};
-    const rarityCounts = {
-        common: 0,
-        uncommon: 0,
-        rare: 0,
-        legendary: 0,
-        lucky: 0,
-        no: 0
-    };
-
-    inventory.forEach(fish => {
-        // Count how many of each fish
-        inventoryCounts[fish] = (inventoryCounts[fish] || 0) + 1;
-
-        // Count how many of each rarity
-        const rarity = fishData[fish]?.rarity || "unknown";
-        if (rarityCounts.hasOwnProperty(rarity)) {
-            rarityCounts[rarity]++;
-        } else {
-            rarityCounts[rarity] = 1;
-        }
-    });
-
-    let inventoryHTML = "<h3>Your Inventory:</h3><ul>";
-    for (const fish in inventoryCounts) {
-        const count = inventoryCounts[fish];
-        const rarity = fishData[fish]?.rarity || "unknown";
-        const value = fishData[fish]?.value || 0;
-        inventoryHTML += `<li>${fish} (${count}) - <strong>${rarity}</strong> - $${value} each</li>`;
-    }
-    inventoryHTML += "</ul>";
-
-    inventoryHTML += "<h4>Rarity Summary:</h4><ul>";
-    for (const rarity in rarityCounts) {
-        if (rarityCounts[rarity] > 0) {
-            inventoryHTML += `<li>${rarity}: ${rarityCounts[rarity]}</li>`;
-        }
-    }
-    inventoryHTML += "</ul>";
-
-    outputEl.innerHTML = inventoryHTML;
+            outputEl.innerHTML = inventoryHTML;
         }
 
         function sellInventory() {
