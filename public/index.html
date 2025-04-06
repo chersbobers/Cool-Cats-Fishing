@@ -23,6 +23,10 @@
             cursor: pointer;
             font-family: monospace;
         }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
         #output {
             min-height: 50px;
             margin: 15px 0;
@@ -70,6 +74,11 @@
             border-radius: 5px;
             display: inline-block;
         }
+        #cooldown-indicator {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -86,6 +95,7 @@
         </div>
         <div id="output"></div>
         <button id="fish-btn">Cast Line!</button>
+        <div id="cooldown-indicator" style="display: none;">Next cast in: <span id="cooldown-timer">2</span>s</div>
         <button id="shop-btn">Shop</button>
         <button id="inventory-btn">Inventory</button>
         <button id="reset-btn">Reset Game</button>
@@ -232,6 +242,8 @@
         let currentFish = null;
         let miniGameActive = false;
         let miniGameTimeout;
+        let canFish = true; // New variable to track fishing cooldown
+        const fishingCooldown = 2000; // 2 seconds in milliseconds
         const miniGameDuration = 2000;
         const miniGameKeys = ['A', 'S', 'D', 'F', 'J', 'K', 'L'];
 
@@ -241,10 +253,35 @@
         const inventoryCountEl = document.getElementById("inventory-count");
         const shopMenuEl = document.getElementById("shop-menu");
         const codeInputEl = document.getElementById("code-input");
+        const fishBtn = document.getElementById("fish-btn");
+        const cooldownIndicator = document.getElementById("cooldown-indicator");
+        const cooldownTimer = document.getElementById("cooldown-timer");
 
         // ================= GAME FUNCTIONS =================
         function fish() {
-            if (miniGameActive) return;
+            if (!canFish || miniGameActive) return;
+            
+            // Start cooldown
+            canFish = false;
+            fishBtn.disabled = true;
+            cooldownIndicator.style.display = "block";
+            
+            let secondsLeft = 2;
+            cooldownTimer.textContent = secondsLeft;
+            
+            const countdown = setInterval(() => {
+                secondsLeft--;
+                cooldownTimer.textContent = secondsLeft;
+                if (secondsLeft <= 0) {
+                    clearInterval(countdown);
+                    cooldownIndicator.style.display = "none";
+                }
+            }, 1000);
+            
+            setTimeout(() => {
+                canFish = true;
+                fishBtn.disabled = false;
+            }, fishingCooldown);
 
             const fishTypes = Object.keys(fishData);
             const rarityRoll = Math.random();
@@ -514,3 +551,4 @@
     </script>
 </body>
 </html>
+                                        \
