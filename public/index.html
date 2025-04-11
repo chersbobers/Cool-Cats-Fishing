@@ -119,12 +119,25 @@
     </style>
 </head>
 <body>
-    <button id="play-music-btn">Play Music</button>
+    <audio id="bg-music" src="chickenjocky.mp3" loop autoplay></audio>
+    <button id="play-music-btn">Pause Music</button>
     <script>
-        document.getElementById("play-music-btn").addEventListener("click", () => {
+        document.addEventListener("DOMContentLoaded", () => {
             const bgMusic = document.getElementById("bg-music");
+            bgMusic.volume = 0.5; // Adjust volume
             bgMusic.play().catch(error => {
                 console.error("Music playback failed:", error);
+            });
+
+            const playMusicBtn = document.getElementById("play-music-btn");
+            playMusicBtn.addEventListener("click", () => {
+                if (bgMusic.paused) {
+                    bgMusic.play();
+                    playMusicBtn.textContent = "Pause Music";
+                } else {
+                    bgMusic.pause();
+                    playMusicBtn.textContent = "Play Music";
+                }
             });
         });
     </script>
@@ -614,4 +627,3 @@
     </script>
 </body>
 </html>
-                                        \
