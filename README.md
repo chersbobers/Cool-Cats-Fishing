@@ -10,7 +10,7 @@ No awards yet be the first?
 
 
 ## ℹ️ Overview
-My game is very lightweight and can run well on chromebooks, It has been designed for community mods to be developed easily please follow the community guidlines for moding these are listed in the wiki! The best mods every month will get added into the game!
+My game is very lightweight and can run well on chromebooks, It has been designed for community mods to be developed easily please follow the community guidlines for moding these are listed in the wiki! The best mods every month will get added into the game! <br>
 *all resources can be found in the wiki*
 
 
