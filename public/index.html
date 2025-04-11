@@ -85,34 +85,73 @@
             font-size: 0.9em;
             color: #555;
         }
+        <style>
+    body {
+        font-family: monospace;
+        padding: 10px;
+        background: url('1.png');
+        background-size: 100px 100px;
+        background-repeat: repeat;
+    }
+
+    #github-link {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 5px 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    #github-link svg {
+        margin-right: 5px;
+    }
+
+    #github-link span {
+        font-size: 0.9em;
+        vertical-align: middle;
+    }
+</style>
     </style>
 </head>
 <body>
-    <audio id="bg-music" autoplay loop>
-        <source src="chickenjocky.mp3" type="audio/mp3">
-        Your browser does not support the audio element.
-    </audio>
+    <button id="play-music-btn">Play Music</button>
+    <script>
+        document.getElementById("play-music-btn").addEventListener("click", () => {
+            const bgMusic = document.getElementById("bg-music");
+            bgMusic.play().catch(error => {
+                console.error("Music playback failed:", error);
+            });
+        });
+    </script>
 
     <div id="game">
         <pre>
             /\_/\                           ><((((º>
-           ( o.o )  🐱 Cool Cats Fishing 🐱   check the github:
+           ( o.o )  🐱 Cool Cats Fishing 🐱
             (   )       <º))))><
              " "
-            <a href="https://github.com/chersbobers/Cool-Cats-Fishing" target="_blank" style="text-decoration: none;">
-    <svg height="24" width="24" viewBox="0 0 16 16" fill="black" style="vertical-align: middle;">
-        <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38
-        0-.19-.01-.82-.01-1.49-2 .37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52
-        -.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2
-        -3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.22 2.2.82A7.62
-        7.62 0 0 1 8 4.84c.68.003 1.37.092 2.01.27 1.52-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08
-        2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01
-        1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-    </svg>
-    <span style="font-size: 0.9em; vertical-align: middle; margin-left: 5px;">View on GitHub</span>
-</a>
+
 
         </pre>
+        <div id="github-link">
+            <a href="https://github.com/chersbobers/Cool-Cats-Fishing" target="_blank">
+                <svg height="24" width="24" viewBox="0 0 16 16" fill="black">
+                    <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38
+                    0-.19-.01-.82-.01-1.49-2 .37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52
+                    -.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2
+                    -3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.22 2.2.82A7.62
+                    7.62 0 0 1 8 4.84c.68.003 1.37.092 2.01.27 1.52-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08
+                    2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01
+                    1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                <span>View on GitHub</span>
+            </a>
+        </div>
         <div>
             <p>Fish Bones: $<span id="money-display">100</span></p>
             <p>Inventory: <span id="inventory-count">0</span> items</p>
