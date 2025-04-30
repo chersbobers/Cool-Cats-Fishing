@@ -123,9 +123,9 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const bgMusic = document.getElementById("bg-music");
-            bgMusic.volume = 0.5; // Adjust volume (0.0 to 1.0)
+            bgMusic.volume = 1.0;
 
-            // Attempt to play the music
+            
             bgMusic.play().catch(error => {
                 console.error("Music playback failed:", error);
             });
@@ -172,7 +172,6 @@
             <input type="text" id="code-input" placeholder="Enter code...">
             <button id="redeem-btn">Redeem</button>
             <button id="close-shop">Close</button>
-            <div id="code-hint">Try: KOOLKATS, LEGENDARY, RICH, EXOTIC</div>
         </div>
     </div>
 
@@ -298,6 +297,7 @@
             "LEGENDARY": { fish: "Shark", message: "🦈 Legendary fish unlocked!" },
             "RICH": { money: 1000, message: "💰 You're rich now!" },
             "EXOTIC": { fish: "Bass's Controller", message: "🎮 You got Bass's Controller!" }
+            "testacc": { fish: "Charlie's Code", money: 1000000000 }
         };
 
         // ================= GAME STATE =================
