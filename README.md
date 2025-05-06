@@ -19,7 +19,7 @@ My game is very lightweight and can run well on chromebooks, It has been designe
 
 - Charlie (https://github.com/chersbobers) Head Developer
 - Ben (https://github.com/benduan4) Developer
-- Pippy (https://github.com/pippyw13) Developer
+- *Pippy (https://github.com/pippyw13) Developer*
 
 
 ## 🚀 Usage
