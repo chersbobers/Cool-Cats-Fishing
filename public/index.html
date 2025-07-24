@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cool Cats Fishing</title>
+    <title>Cool Cats Fishing - Stardew Style</title>
     <style>
         * {
             box-sizing: border-box;
@@ -10,7 +10,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Courier New', monospace;
             padding: 20px;
             background: linear-gradient(135deg, #6dd5ed, #2193b0);
             background-size: 400% 400%;
@@ -26,7 +26,7 @@
         }
 
         #game {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 30px;
             background: rgba(255, 255, 255, 0.95);
@@ -57,18 +57,105 @@
             margin-bottom: 25px;
         }
 
-        .header pre {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 20px;
             color: #2c3e50;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+        }
+
+        .scene-container {
+            flex: 1;
+            min-width: 300px;
+            background: linear-gradient(to bottom, #87CEEB, #4682B4);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .scene-container::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to top, #8B4513, #A0522D);
+        }
+
+        .water {
+            position: absolute;
+            bottom: 40%;
+            left: 0;
+            right: 0;
+            height: 30%;
+            background: linear-gradient(to bottom, #1E90FF, #00008B);
+            opacity: 0.7;
+        }
+
+        .cat-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .cat-container:hover {
+            transform: scale(1.05);
+        }
+
+        .cat-pixel-art {
+            font-family: monospace;
+            font-size: 10px;
+            line-height: 10px;
+            letter-spacing: 0px;
+            white-space: pre;
+            color: #333;
+            text-align: left;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .fishing-rod {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 2px;
+            background: #8B4513;
+            transform-origin: left center;
+            z-index: 5;
+            display: none;
+        }
+
+        .fish-icon {
+            position: absolute;
+            font-size: 24px;
+            z-index: 6;
+            display: none;
         }
 
         .stats {
@@ -108,7 +195,7 @@
         }
 
         #output {
-            min-height: 150px;
+            min-height: 100px;
             margin: 25px 0;
             padding: 20px;
             border-radius: 15px;
@@ -151,44 +238,71 @@
             75% { transform: translateX(5px); }
         }
 
-        .mini-game-container {
+        /* Stardew Valley Style Fishing Mini-Game */
+        #fishing-game {
+            display: none;
             width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
             text-align: center;
-        }
-
-        .key-to-press {
-            font-size: 3.5rem;
-            font-weight: bold;
-            margin: 25px 0;
-            padding: 25px;
-            background: linear-gradient(135deg, #3498db, #2c3e50);
             color: white;
-            border-radius: 15px;
-            display: inline-block;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            animation: pulse 1s infinite;
-            min-width: 150px;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); }
-            50% { transform: scale(1.05); box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3); }
-            100% { transform: scale(1); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); }
-        }
-
-        .mini-game-timer {
-            height: 20px;
-            background: #ecf0f1;
+        .fishing-container {
+            position: relative;
+            height: 200px;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
             overflow: hidden;
-            margin-top: 20px;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
         }
 
-        .timer-progress {
+        .fishing-bar {
+            position: absolute;
+            left: 0;
+            width: 10px;
+            height: 20px;
+            background: #ff0000;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 5px;
+            transition: top 0.1s linear;
+        }
+
+        .sweet-spot {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 255, 0, 0.3);
+            top: 50%;
+            transform: translateY(-50%);
+            border: 2px dashed #00ff00;
+            border-radius: 5px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #2ecc71, #3498db);
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #ffff00, #ff0000);
+            width: 0%;
             transition: width 0.1s linear;
+        }
+
+        .fishing-instructions {
+            margin: 15px 0;
+            font-size: 1.1rem;
         }
 
         .action-buttons {
@@ -202,7 +316,7 @@
             padding: 15px;
             border: none;
             border-radius: 12px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Courier New', monospace;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
@@ -311,7 +425,7 @@
             100% { opacity: 1; }
         }
 
-        #shop-menu {
+        #shop-menu, #inventory-menu {
             background: linear-gradient(135deg, #e8f4f8, #d1eef3);
             margin-top: 25px;
             padding: 25px;
@@ -319,6 +433,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border: 2px solid #3498db;
             animation: slideIn 0.5s ease;
+            display: none;
         }
 
         @keyframes slideIn {
@@ -326,7 +441,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        #shop-menu h3 {
+        #shop-menu h3, #inventory-menu h3 {
             margin-top: 0;
             color: #2c3e50;
             text-align: center;
@@ -345,17 +460,19 @@
             padding: 15px;
             border: 2px solid #3498db;
             border-radius: 10px;
+            font-family: 'Courier New', monospace;
             font-size: 1rem;
             min-width: 200px;
         }
 
-        #redeem-btn, #close-shop {
+        #redeem-btn, #close-shop, #close-inventory {
             padding: 15px 25px;
             border: none;
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s;
+            font-family: 'Courier New', monospace;
         }
 
         #redeem-btn {
@@ -363,7 +480,7 @@
             color: white;
         }
 
-        #close-shop {
+        #close-shop, #close-inventory {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
             width: 100%;
@@ -401,16 +518,30 @@
             color: #333;
         }
 
-        .fish-icon {
-            display: inline-block;
-            margin: 0 5px;
-            animation: float 3s ease-in-out infinite;
+        /* Inventory items */
+        .inventory-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        .inventory-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .inventory-item .item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .inventory-item .item-count {
+            font-size: 0.9rem;
+            color: #666;
         }
 
         /* Responsive design */
@@ -442,12 +573,6 @@
             
             .action-buttons {
                 grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .key-to-press {
-                font-size: 2.5rem;
-                padding: 20px;
-                min-width: 120px;
             }
         }
 
@@ -502,13 +627,7 @@
 
     <div id="game">
         <div class="header">
-            <pre>
-                /\_/\                           ><((((º>
-               ( o.o )  🐱 Cool Cats Fishing 🐱
-                (   )       <º))))><
-                 " "
-            </pre>
-            <h1>🎮 Cool Cats Fishing</h1>
+            <h1>🎮 Cool Cats Fishing - Stardew Style</h1>
         </div>
         
         <div class="stats">
@@ -522,15 +641,44 @@
             </div>
         </div>
 
+        <div class="game-area">
+            <div class="scene-container">
+                <div class="water"></div>
+                <div class="cat-container" id="cat-container">
+                    <div class="cat-pixel-art" id="cat-art">
+   /\   /\
+  (  . .)
+   )   (
+  (  v  )
+  ^^   ^^
+                    </div>
+                </div>
+                <div class="fishing-rod" id="fishing-rod"></div>
+                <div class="fish-icon" id="fish-icon">🐟</div>
+            </div>
+        </div>
+
         <div id="output" class="welcome">
-            Welcome to Cool Cats Fishing! Click 'Cast Line!' to start fishing!
+            Click the cat to start fishing!
+        </div>
+
+        <!-- Stardew Valley Style Fishing Mini-Game -->
+        <div id="fishing-game">
+            <h3>Fishing Mini-Game</h3>
+            <div class="fishing-instructions">
+                Press SPACE when the red bar is in the green zone!
+            </div>
+            <div class="fishing-container">
+                <div class="sweet-spot" id="sweet-spot"></div>
+                <div class="fishing-bar" id="fishing-bar"></div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div>Progress: <span id="progress-text">0</span>%</div>
         </div>
 
         <div class="action-buttons">
-            <button id="fish-btn" class="fish-btn">🎣 Cast Line!</button>
-            <div id="cooldown-indicator" style="display: none;">
-                Next cast in: <span id="cooldown-timer">2</span>s
-            </div>
             <button id="shop-btn" class="shop-btn">🛒 Shop</button>
             <button id="inventory-btn" class="inventory-btn">📦 Inventory</button>
             <button id="reset-btn" class="reset-btn">🔄 Reset Game</button>
@@ -539,13 +687,21 @@
             <button id="sell-legendary-btn" class="sell-legendary-btn">👑 Sell Legendary</button>
         </div>
 
-        <div id="shop-menu" style="display: none;">
+        <div id="shop-menu">
             <h3>Secret Code Redemption</h3>
             <div class="code-input-container">
                 <input type="text" id="code-input" placeholder="Enter code...">
                 <button id="redeem-btn">Redeem</button>
             </div>
             <button id="close-shop">Close</button>
+        </div>
+
+        <div id="inventory-menu">
+            <h3>Your Inventory</h3>
+            <div class="inventory-items" id="inventory-items">
+                <!-- Inventory items will be added here -->
+            </div>
+            <button id="close-inventory">Close</button>
         </div>
     </div>
 
@@ -687,48 +843,93 @@
         let inventory = [];
         let money = 100;
         let currentFish = null;
-        let miniGameActive = false;
-        let miniGameTimeout;
+        let fishingActive = false;
+        let fishingGameActive = false;
         let canFish = true;
         const fishingCooldown = 2000;
-        const miniGameDuration = 2000;
-        const miniGameKeys = ['A', 'S', 'D', 'F', 'J', 'K', 'L'];
-        let targetKey = '';
+        
+        // Fishing game variables
+        let fishingBarPosition = 0;
+        let fishingBarDirection = 2;
+        let fishingGameInterval;
+        let progress = 0;
+        let sweetSpotTop = 70;
+        let sweetSpotHeight = 60;
+        let fishingSuccess = false;
+        
+        let fishingRodEl = document.getElementById('fishing-rod');
+        let fishIconEl = document.getElementById('fish-icon');
+        let catArtEl = document.getElementById('cat-art');
+        let catContainerEl = document.getElementById('cat-container');
+        let fishingGameEl = document.getElementById('fishing-game');
+        let fishingBarEl = document.getElementById('fishing-bar');
+        let sweetSpotEl = document.getElementById('sweet-spot');
+        let progressBarEl = document.getElementById('progress-bar');
+        let progressTextEl = document.getElementById('progress-text');
 
         // ================= DOM ELEMENTS =================
         const outputEl = document.getElementById("output");
         const moneyEl = document.getElementById("money-display");
         const inventoryCountEl = document.getElementById("inventory-count");
         const shopMenuEl = document.getElementById("shop-menu");
+        const inventoryMenuEl = document.getElementById("inventory-menu");
         const codeInputEl = document.getElementById("code-input");
-        const fishBtn = document.getElementById("fish-btn");
         const cooldownIndicator = document.getElementById("cooldown-indicator");
         const cooldownTimer = document.getElementById("cooldown-timer");
+        const inventoryItemsEl = document.getElementById("inventory-items");
 
         // ================= GAME FUNCTIONS =================
-        function fish() {
-            if (!canFish || miniGameActive) return;
+        function startFishing() {
+            if (!canFish || fishingActive) return;
+            
+            fishingActive = true;
+            canFish = false;
+            
+            // Animate cat
+            catArtEl.textContent = `
+   /\   /\
+  (  o o)
+   )   (
+  (  v  )
+  ^^   ^^
+            `;
+            
+            // Show fishing rod and fish
+            fishingRodEl.style.display = 'block';
+            fishIconEl.style.display = 'block';
+            
+            // Position fish randomly
+            fishIconEl.style.left = (Math.random() * 80 + 10) + '%';
+            fishIconEl.style.top = '70%';
 
             // Start cooldown
-            canFish = false;
-            fishBtn.disabled = true;
             cooldownIndicator.style.display = "block";
-
             let secondsLeft = 2;
-            cooldownTimer.textContent = secondsLeft;
+            if (cooldownTimer) cooldownTimer.textContent = secondsLeft;
 
             const countdown = setInterval(() => {
                 secondsLeft--;
-                cooldownTimer.textContent = secondsLeft;
+                if (cooldownTimer) cooldownTimer.textContent = secondsLeft;
                 if (secondsLeft <= 0) {
                     clearInterval(countdown);
-                    cooldownIndicator.style.display = "none";
+                    if (cooldownIndicator) cooldownIndicator.style.display = "none";
                 }
             }, 1000);
 
             setTimeout(() => {
                 canFish = true;
-                fishBtn.disabled = false;
+                // Reset cat
+                catArtEl.textContent = `
+   /\   /\
+  (  . .)
+   )   (
+  (  v  )
+  ^^   ^^
+                `;
+                // Hide fishing elements
+                fishingRodEl.style.display = 'none';
+                fishIconEl.style.display = 'none';
+                fishingActive = false;
             }, fishingCooldown);
 
             const fishTypes = Object.keys(fishData);
@@ -750,56 +951,161 @@
             }
 
             currentFish = eligibleFish[Math.floor(Math.random() * eligibleFish.length)];
-            outputEl.innerHTML = `🎣 You hooked a <strong class="${fishRarity}">${currentFish}</strong>! (${fishRarity})<br>Quick! Press the correct key!`;
-            outputEl.className = "";
+            outputEl.innerHTML = `🎣 You hooked a <strong class="${fishRarity}">${currentFish}</strong>! (${fishRarity})<br>Get ready for the mini-game!`;
+            outputEl.className = "welcome";
 
-            startMiniGame();
-        }
-
-        function startMiniGame() {
-            miniGameActive = true;
-            targetKey = miniGameKeys[Math.floor(Math.random() * miniGameKeys.length)];
-
-            outputEl.innerHTML = `
-                <div class="mini-game-container">
-                    <p>Press this key to catch the fish:</p>
-                    <div class="key-to-press">${targetKey}</div>
-                    <div class="mini-game-timer">
-                        <div class="timer-progress" id="mini-game-timer"></div>
-                    </div>
-                </div>
-            `;
-
-            // Start timer animation
-            const timerEl = document.getElementById('mini-game-timer');
+            // Start fishing mini-game after a short delay
             setTimeout(() => {
-                timerEl.style.width = '0%';
-                timerEl.style.transition = `width ${miniGameDuration}ms linear`;
-            }, 50);
-
-            miniGameTimeout = setTimeout(() => {
-                miniGameFail();
-            }, miniGameDuration);
+                startFishingGame();
+            }, 1500);
         }
 
-        function miniGameSuccess() {
-            clearTimeout(miniGameTimeout);
+        function startFishingGame() {
+            fishingGameActive = true;
+            fishingGameEl.style.display = 'block';
+            outputEl.innerHTML = "Press SPACE when the red bar is in the green zone!";
+            outputEl.className = "welcome";
             
-            inventory.push(currentFish);
-            outputEl.innerHTML = `🎉 You caught the <strong class="${getFishRarity(currentFish)}">${currentFish}</strong>!`;
-            outputEl.className = "success";
-            miniGameActive = false;
-
-            saveGame();
-            updateUI();
+            // Set random sweet spot position
+            sweetSpotTop = 20 + Math.random() * 60;
+            sweetSpotEl.style.top = sweetSpotTop + '%';
+            sweetSpotEl.style.height = sweetSpotHeight + 'px';
+            
+            // Reset progress
+            progress = 0;
+            progressBarEl.style.width = '0%';
+            progressTextEl.textContent = '0';
+            
+            // Initialize fishing bar position
+            fishingBarPosition = 0;
+            fishingBarDirection = 2 + Math.random() * 3; // Random speed
+            
+            // Start fishing game loop
+            fishingGameInterval = setInterval(updateFishingGame, 50);
         }
 
-        function miniGameFail() {
-            clearTimeout(miniGameTimeout);
+        function updateFishingGame() {
+            // Move fishing bar
+            fishingBarPosition += fishingBarDirection;
             
-            outputEl.innerHTML = `😿 The <strong class="${getFishRarity(currentFish)}">${currentFish}</strong> got away!`;
-            outputEl.className = "failure";
-            miniGameActive = false;
+            // Reverse direction at boundaries
+            if (fishingBarPosition <= 0 || fishingBarPosition >= 180) {
+                fishingBarDirection = -fishingBarDirection;
+            }
+            
+            // Update fishing bar position
+            fishingBarEl.style.top = fishingBarPosition + 'px';
+            
+            // Update progress if in sweet spot
+            const barTop = fishingBarPosition;
+            const spotTop = sweetSpotTop * 1.8; // Convert percentage to pixels (200px container)
+            const spotBottom = spotTop + sweetSpotHeight;
+            
+            if (barTop >= spotTop && barTop <= spotBottom) {
+                progress += 1;
+                if (progress > 100) progress = 100;
+                progressBarEl.style.width = progress + '%';
+                progressTextEl.textContent = progress;
+                
+                // Check for success
+                if (progress >= 100) {
+                    fishingSuccess = true;
+                    endFishingGame();
+                }
+            }
+        }
+
+        function handleFishingInput() {
+            if (!fishingGameActive) return;
+            
+            // Check if bar is in sweet spot
+            const barTop = fishingBarPosition;
+            const spotTop = sweetSpotTop * 1.8; // Convert percentage to pixels
+            const spotBottom = spotTop + sweetSpotHeight;
+            
+            if (barTop >= spotTop && barTop <= spotBottom) {
+                // Good timing, increase progress faster
+                progress += 3;
+                if (progress > 100) progress = 100;
+                progressBarEl.style.width = progress + '%';
+                progressTextEl.textContent = Math.floor(progress);
+                
+                // Check for success
+                if (progress >= 100) {
+                    fishingSuccess = true;
+                    endFishingGame();
+                }
+            } else {
+                // Bad timing, decrease progress
+                progress -= 5;
+                if (progress < 0) progress = 0;
+                progressBarEl.style.width = progress + '%';
+                progressTextEl.textContent = Math.floor(progress);
+                
+                // Check for failure
+                if (progress <= 0) {
+                    fishingSuccess = false;
+                    endFishingGame();
+                }
+            }
+        }
+
+        function endFishingGame() {
+            clearInterval(fishingGameInterval);
+            fishingGameActive = false;
+            fishingGameEl.style.display = 'none';
+            
+            if (fishingSuccess) {
+                // Success
+                catArtEl.textContent = `
+   /\   /\
+  (  ^ ^)
+   )   (
+  (  ^  )
+  ^^   ^^
+                `;
+                
+                inventory.push(currentFish);
+                outputEl.innerHTML = `🎉 You caught the <strong class="${getFishRarity(currentFish)}">${currentFish}</strong>!`;
+                outputEl.className = "success";
+                
+                saveGame();
+                updateUI();
+                
+                // Reset after delay
+                setTimeout(() => {
+                    catArtEl.textContent = `
+   /\   /\
+  (  . .)
+   )   (
+  (  v  )
+  ^^   ^^
+                    `;
+                }, 1000);
+            } else {
+                // Failure
+                catArtEl.textContent = `
+   /\   /\
+  (  > <)
+   )   (
+  (  v  )
+  ^^   ^^
+                `;
+                
+                outputEl.innerHTML = `😿 The <strong class="${getFishRarity(currentFish)}">${currentFish}</strong> got away!`;
+                outputEl.className = "failure";
+                
+                // Reset after delay
+                setTimeout(() => {
+                    catArtEl.textContent = `
+   /\   /\
+  (  . .)
+   )   (
+  (  v  )
+  ^^   ^^
+                    `;
+                }, 1000);
+            }
         }
 
         function getFishRarity(fishName) {
@@ -808,14 +1114,54 @@
 
         function toggleShop() {
             shopMenuEl.style.display = shopMenuEl.style.display === "block" ? "none" : "block";
+            inventoryMenuEl.style.display = "none";
             if (shopMenuEl.style.display === "block") {
                 outputEl.innerHTML = "Enter a secret code!";
                 outputEl.className = "";
                 codeInputEl.focus();
             } else {
-                outputEl.innerHTML = "Welcome to Cool Cats Fishing! Click 'Cast Line!' to start fishing!";
+                outputEl.innerHTML = "Click the cat to start fishing!";
                 outputEl.className = "welcome";
             }
+        }
+
+        function toggleInventory() {
+            inventoryMenuEl.style.display = inventoryMenuEl.style.display === "block" ? "none" : "block";
+            shopMenuEl.style.display = "none";
+            if (inventoryMenuEl.style.display === "block") {
+                showInventoryItems();
+                outputEl.innerHTML = "Your inventory items";
+                outputEl.className = "";
+            } else {
+                outputEl.innerHTML = "Click the cat to start fishing!";
+                outputEl.className = "welcome";
+            }
+        }
+
+        function showInventoryItems() {
+            if (inventory.length === 0) {
+                inventoryItemsEl.innerHTML = "<p>Your inventory is empty!</p>";
+                return;
+            }
+
+            const inventoryCounts = {};
+            inventory.forEach(fish => {
+                inventoryCounts[fish] = (inventoryCounts[fish] || 0) + 1;
+            });
+
+            let inventoryHTML = "";
+            for (const fish in inventoryCounts) {
+                const rarity = getFishRarity(fish);
+                inventoryHTML += `
+                    <div class="inventory-item">
+                        <div class="item-name ${rarity}">${fish}</div>
+                        <div class="item-count">Quantity: ${inventoryCounts[fish]}</div>
+                        <div class="item-value">Value: $${fishData[fish]?.value || 10} each</div>
+                    </div>
+                `;
+            }
+
+            inventoryItemsEl.innerHTML = inventoryHTML;
         }
 
         function redeemCode() {
@@ -840,29 +1186,6 @@
             }
             codeInputEl.value = "";
             saveGame();
-        }
-
-        function showInventory() {
-            if (inventory.length === 0) {
-                outputEl.innerHTML = "Your inventory is empty!";
-                outputEl.className = "";
-                return;
-            }
-
-            const inventoryCounts = {};
-            inventory.forEach(fish => {
-                inventoryCounts[fish] = (inventoryCounts[fish] || 0) + 1;
-            });
-
-            let inventoryHTML = "<h3>Your Inventory:</h3><ul>";
-            for (const fish in inventoryCounts) {
-                const rarity = getFishRarity(fish);
-                inventoryHTML += `<li><strong class="${rarity}">${fish}</strong> (${inventoryCounts[fish]}) - $${fishData[fish]?.value || 10} each</li>`;
-            }
-            inventoryHTML += "</ul>";
-
-            outputEl.innerHTML = inventoryHTML;
-            outputEl.className = "";
         }
 
         function sellInventory() {
@@ -990,27 +1313,23 @@
 
         // Keyboard event handling
         function handleKeyPress(e) {
-            if (!miniGameActive) return;
-            
-            const pressedKey = e.key.toUpperCase();
-            if (pressedKey === targetKey) {
-                miniGameSuccess();
-            } else if (miniGameKeys.includes(pressedKey)) {
-                miniGameFail();
+            if (fishingGameActive && e.code === 'Space') {
+                handleFishingInput();
             }
         }
 
         // Event listeners
         document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("fish-btn").addEventListener("click", fish);
+            catContainerEl.addEventListener("click", startFishing);
             document.getElementById("shop-btn").addEventListener("click", toggleShop);
-            document.getElementById("inventory-btn").addEventListener("click", showInventory);
+            document.getElementById("inventory-btn").addEventListener("click", toggleInventory);
             document.getElementById("sell-btn").addEventListener("click", sellInventory);
             document.getElementById("sell-rare-btn").addEventListener("click", sellRareFish);
             document.getElementById("sell-legendary-btn").addEventListener("click", sellLegendaryFish);
             document.getElementById("reset-btn").addEventListener("click", resetGame);
             document.getElementById("redeem-btn").addEventListener("click", redeemCode);
             document.getElementById("close-shop").addEventListener("click", toggleShop);
+            document.getElementById("close-inventory").addEventListener("click", toggleInventory);
             document.addEventListener("keydown", handleKeyPress);
 
             loadGame();
